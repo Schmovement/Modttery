@@ -7,25 +7,32 @@
   <title>Modttery™ — Modular. Smart. Sustainable.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap"
     rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     :root {
-      --black: #080808;
-      --charcoal: #111214;
-      --steel: #191c20;
-      --mid: #252a30;
-      --border: #2a2f36;
-      --silver: #7a8490;
-      --light: #bcc6d0;
-      --white: #ecf0f4;
-      --gold: #c9a227;
-      --gold-light: #e8c04a;
-      --green: #3ddc84;
-      --green-dim: #163d26;
-      --red: #e84545;
-      --blue: #4a9eff;
+      --bg: #f4f1eb;
+      --bg2: #edeae2;
+      --bg3: #e5e1d7;
+      --panel: #faf8f4;
+      --border: #d6d0c4;
+      --border2: #c8c2b4;
+      --ink: #1a1814;
+      --ink2: #2e2b25;
+      --mid: #6b6558;
+      --muted: #9b9488;
+      --gold: #b8891e;
+      --gold-l: #d4a535;
+      --gold-pale: #f5e8cc;
+      --green: #2d8a5f;
+      --green-bg: #e8f4ee;
+      --red: #c0392b;
+      --blue: #2c6eb5;
+      --blue-bg: #e8f0fb;
+      --white: #fdfcf9;
+      --shadow: rgba(26, 24, 20, 0.08);
+      --shadow2: rgba(26, 24, 20, 0.14);
     }
 
     *,
@@ -41,26 +48,26 @@
     }
 
     body {
-      background: var(--black);
-      color: var(--white);
+      background: var(--bg);
+      color: var(--ink);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       line-height: 1.6;
       overflow-x: hidden
     }
 
-    /* NOISE */
+    /* SUBTLE GRAIN */
     body::after {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 9000;
-      opacity: 0.5
+      opacity: 0.4
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0;
@@ -71,21 +78,22 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 52px;
-      height: 62px;
-      background: rgba(8, 8, 8, 0.88);
-      backdrop-filter: blur(24px);
+      height: 64px;
+      background: rgba(244, 241, 235, 0.92);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border)
     }
 
     .nav-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 26px;
-      letter-spacing: 3px;
-      color: var(--white)
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none
     }
 
-    .nav-logo span {
-      color: var(--gold)
+    .nav-logo-svg {
+      height: 36px;
+      width: auto
     }
 
     .nav-links {
@@ -95,7 +103,7 @@
     }
 
     .nav-links a {
-      color: var(--silver);
+      color: var(--mid);
       text-decoration: none;
       font-size: 11px;
       letter-spacing: 2px;
@@ -112,9 +120,37 @@
       font-family: 'DM Mono', monospace;
       font-size: 10px;
       color: var(--green);
-      border: 1px solid var(--green-dim);
+      border: 1px solid rgba(45, 138, 95, .35);
+      background: var(--green-bg);
       padding: 5px 14px;
-      letter-spacing: 1px
+      letter-spacing: 1px;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .nav-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s ease-in-out infinite
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(.8)
+      }
     }
 
     /* ── HERO ── */
@@ -125,26 +161,39 @@
       grid-template-columns: 1fr 1fr;
       align-items: center;
       padding: 80px 72px 60px;
-      overflow: hidden
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%)
     }
 
     .hero-glow {
       position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 700px;
-      height: 700px;
-      background: radial-gradient(circle, rgba(201, 162, 39, .07) 0%, transparent 65%);
+      top: -60px;
+      right: -60px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(184, 137, 30, .08) 0%, transparent 65%);
       pointer-events: none
     }
 
     .hero-glow2 {
       position: absolute;
-      bottom: -200px;
-      left: -100px;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(74, 158, 255, .04) 0%, transparent 65%);
+      bottom: -150px;
+      left: -80px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(44, 110, 181, .05) 0%, transparent 65%);
+      pointer-events: none
+    }
+
+    .hero-pattern {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+      background-size: 32px 32px;
+      opacity: .4;
       pointer-events: none
     }
 
@@ -174,10 +223,11 @@
 
     .hero-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(72px, 8vw, 120px);
+      font-size: clamp(72px, 8vw, 118px);
       line-height: .9;
       letter-spacing: 2px;
-      margin-bottom: 16px
+      margin-bottom: 16px;
+      color: var(--ink)
     }
 
     .hero-title em {
@@ -187,17 +237,17 @@
 
     .hero-sub {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(14px, 1.6vw, 22px);
+      font-size: clamp(14px, 1.6vw, 21px);
       letter-spacing: 7px;
-      color: var(--silver);
+      color: var(--muted);
       margin-bottom: 28px
     }
 
     .hero-desc {
       font-size: 15px;
-      color: var(--light);
+      color: var(--mid);
       max-width: 400px;
-      line-height: 1.75;
+      line-height: 1.8;
       margin-bottom: 40px;
       border-left: 2px solid var(--gold);
       padding-left: 18px
@@ -210,8 +260,8 @@
 
     .btn-p {
       background: var(--gold);
-      color: var(--black);
-      padding: 13px 32px;
+      color: var(--white);
+      padding: 14px 34px;
       font-weight: 700;
       font-size: 12px;
       letter-spacing: 2px;
@@ -220,33 +270,35 @@
       cursor: pointer;
       text-decoration: none;
       display: inline-block;
-      transition: background .2s, transform .2s
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(184, 137, 30, .25)
     }
 
     .btn-p:hover {
-      background: var(--gold-light);
-      transform: translateY(-2px)
+      background: var(--gold-l);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(184, 137, 30, .35)
     }
 
     .btn-o {
       background: transparent;
-      color: var(--white);
-      padding: 13px 32px;
+      color: var(--ink2);
+      padding: 14px 34px;
       font-size: 12px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border2);
       text-decoration: none;
       display: inline-block;
-      transition: border-color .2s, color .2s
+      transition: border-color .2s, color .2s, background .2s
     }
 
     .btn-o:hover {
       border-color: var(--gold);
-      color: var(--gold)
+      color: var(--gold);
+      background: var(--gold-pale)
     }
 
-    /* Hero 3D canvas */
     .hero-right {
       position: relative;
       display: flex;
@@ -257,7 +309,8 @@
     #hero-canvas {
       width: 100%;
       height: 560px;
-      display: block
+      display: block;
+      border-radius: 4px
     }
 
     .canvas-label {
@@ -268,8 +321,12 @@
       font-family: 'DM Mono', monospace;
       font-size: 9px;
       letter-spacing: 2px;
-      color: var(--silver);
-      text-align: center
+      color: var(--muted);
+      text-align: center;
+      background: rgba(244, 241, 235, .8);
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 2px
     }
 
     /* STATS */
@@ -278,14 +335,33 @@
       grid-template-columns: repeat(5, 1fr);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      background: var(--charcoal)
+      background: var(--panel)
     }
 
     .stat {
       padding: 28px 36px;
       border-right: 1px solid var(--border);
       text-align: center;
-      transition: background .2s
+      transition: background .2s, transform .2s;
+      cursor: default;
+      position: relative;
+      overflow: hidden
+    }
+
+    .stat::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: var(--gold);
+      transition: width .3s
+    }
+
+    .stat:hover::after {
+      width: 60%
     }
 
     .stat:last-child {
@@ -293,7 +369,7 @@
     }
 
     .stat:hover {
-      background: var(--steel)
+      background: var(--bg2)
     }
 
     .stat-v {
@@ -305,14 +381,14 @@
 
     .stat-u {
       font-size: 18px;
-      color: var(--silver)
+      color: var(--muted)
     }
 
     .stat-l {
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--silver);
+      color: var(--muted);
       margin-top: 4px;
       font-weight: 500
     }
@@ -321,7 +397,7 @@
     .div {
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
-      opacity: .25
+      opacity: .2
     }
 
     /* ── SECTIONS ── */
@@ -340,15 +416,16 @@
 
     .st {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(36px, 3.5vw, 58px);
+      font-size: clamp(36px, 3.5vw, 56px);
       line-height: 1;
       letter-spacing: 1px;
-      margin-bottom: 16px
+      margin-bottom: 16px;
+      color: var(--ink)
     }
 
     .sd {
       font-size: 14px;
-      color: var(--silver);
+      color: var(--mid);
       line-height: 1.8;
       max-width: 480px
     }
@@ -357,7 +434,7 @@
     .img-strip {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
+      gap: 3px;
       margin-top: 56px
     }
 
@@ -371,12 +448,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.7) saturate(.8);
+      filter: brightness(.75) saturate(.85);
       transition: filter .4s, transform .5s
     }
 
     .img-tile:hover img {
-      filter: brightness(.9) saturate(1);
+      filter: brightness(.95) saturate(1);
       transform: scale(1.04)
     }
 
@@ -386,11 +463,11 @@
       left: 0;
       right: 0;
       padding: 14px 18px;
-      background: linear-gradient(transparent, rgba(0, 0, 0, .8));
+      background: linear-gradient(transparent, rgba(26, 24, 20, .75));
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px;
       letter-spacing: 2px;
-      color: var(--white)
+      color: #fff
     }
 
     .img-tile-tag {
@@ -401,98 +478,555 @@
       font-size: 9px;
       letter-spacing: 2px;
       color: var(--gold);
-      background: rgba(0, 0, 0, .7);
+      background: rgba(244, 241, 235, .88);
       padding: 4px 10px;
-      border: 1px solid rgba(201, 162, 39, .3)
+      border: 1px solid rgba(184, 137, 30, .35)
     }
 
-    /* ── HOW IT WORKS ── */
-    .how-wrap {
+    /* ════════════════════════════
+   HOW IT WORKS — INTERACTIVE
+════════════════════════════ */
+    #how {
+      background: var(--panel)
+    }
+
+    .how-layout {
+      margin-top: 60px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: start;
-      margin-top: 56px
+      grid-template-columns: 1fr 1.1fr;
+      gap: 72px;
+      align-items: start
     }
 
-    .steps {}
+    /* Left: clickable step list */
+    .how-steps {}
 
-    .step {
-      display: grid;
-      grid-template-columns: 44px 1fr;
-      gap: 20px;
-      padding: 22px 0;
-      border-bottom: 1px solid var(--border);
-      cursor: default
+    .how-step {
+      display: flex;
+      gap: 0;
+      cursor: pointer;
+      position: relative;
+      padding-bottom: 0
     }
 
-    .step:first-child {
-      border-top: 1px solid var(--border)
+    .how-step+.how-step {
+      margin-top: 0
     }
 
-    .step-n {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 32px;
-      color: var(--border);
-      transition: color .2s
+    /* Connecting vertical track */
+    .how-step-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 52px;
+      flex-shrink: 0;
+      padding-top: 4px
     }
 
-    .step:hover .step-n {
-      color: var(--gold)
+    .how-step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--panel);
+      transition: all .35s;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1
     }
 
-    .step h3 {
+    .how-step.active .how-step-num {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(184, 137, 30, .35)
+    }
+
+    .how-step-line {
+      width: 1px;
+      flex: 1;
+      min-height: 32px;
+      background: var(--border);
+      transition: background .35s;
+      margin: 4px 0
+    }
+
+    .how-step.active .how-step-line,
+    .how-step.done .how-step-line {
+      background: var(--gold-l)
+    }
+
+    .how-step:last-child .how-step-line {
+      display: none
+    }
+
+    .how-step-content {
+      flex: 1;
+      padding: 4px 0 32px;
+      padding-left: 4px
+    }
+
+    .how-step-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 20px;
       letter-spacing: 1px;
-      margin-bottom: 4px
+      color: var(--mid);
+      transition: color .3s;
+      margin-bottom: 0
     }
 
-    .step p {
+    .how-step.active .how-step-title {
+      color: var(--ink)
+    }
+
+    .how-step-body {
       font-size: 13px;
-      color: var(--silver);
-      line-height: 1.6
+      color: var(--muted);
+      line-height: 1.65;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .45s cubic-bezier(.4, 0, .2, 1), opacity .35s;
+      margin-top: 0
     }
 
-    /* How right: 3D anatomy canvas */
-    .anatomy-3d {
+    .how-step.active .how-step-body {
+      max-height: 120px;
+      opacity: 1;
+      margin-top: 8px
+    }
+
+    .how-step-tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: var(--gold-pale);
+      border: 1px solid rgba(184, 137, 30, .3);
+      padding: 3px 10px;
+      margin-top: 10px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all .3s .1s
+    }
+
+    .how-step.active .how-step-tag {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    /* Right: interactive visual panel */
+    .how-visual {
       position: sticky;
-      top: 80px;
-      background: var(--charcoal);
-      border: 1px solid var(--border)
+      top: 90px
     }
 
-    #anatomy-canvas {
-      width: 100%;
-      height: 400px;
+    .how-display {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      border-radius: 4px
+    }
+
+    .how-display-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3)
+    }
+
+    .how-display-dots {
+      display: flex;
+      gap: 6px
+    }
+
+    .how-display-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    .hdd1 {
+      background: #e57373
+    }
+
+    .hdd2 {
+      background: #ffb74d
+    }
+
+    .hdd3 {
+      background: #81c784
+    }
+
+    .how-display-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted)
+    }
+
+    .how-panels {
+      position: relative
+    }
+
+    .how-panel {
+      padding: 32px;
+      display: none;
+      animation: panelIn .4s ease
+    }
+
+    .how-panel.visible {
       display: block
     }
 
-    .anatomy-labels {
-      padding: 20px 28px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
     }
 
-    .al {
+    /* Panel content styles */
+    .panel-icon-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--silver)
+      gap: 16px;
+      margin-bottom: 24px
     }
 
-    .al-dot {
+    .panel-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0
+    }
+
+    .panel-icon-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+      color: var(--ink)
+    }
+
+    .panel-icon-sub {
+      font-size: 12px;
+      color: var(--mid);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 1px
+    }
+
+    /* Step-specific diagrams */
+    .snap-demo {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 16px;
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px
+    }
+
+    .snap-module {
+      width: 52px;
+      height: 72px;
+      border: 1.5px solid var(--border2);
+      border-radius: 3px;
+      background: linear-gradient(135deg, #d6d0c4, #c8c2b4);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform .2s, border-color .3s;
+      flex-shrink: 0
+    }
+
+    .snap-module:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold)
+    }
+
+    .snap-module .led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      animation: pulse-led 2s ease-in-out infinite
+    }
+
+    @keyframes pulse-led {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .snap-module span {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      color: var(--mid);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg)
+    }
+
+    .snap-arrow {
+      font-size: 20px;
+      color: var(--gold);
+      flex-shrink: 0
+    }
+
+    .snap-tray {
+      width: 180px;
+      height: 80px;
+      border: 2px dashed var(--gold);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold-pale);
+      transition: all .3s
+    }
+
+    .snap-tray span {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--gold);
+      letter-spacing: 1px
+    }
+
+    .bms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px
+    }
+
+    .bms-item {
+      padding: 12px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--mid)
+    }
+
+    .bms-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0
     }
 
+    .bms-check {
+      color: var(--green);
+      font-size: 16px;
+      flex-shrink: 0
+    }
+
+    .flow-anim {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .flow-node {
+      padding: 12px 16px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: .5px;
+      border: 1px solid
+    }
+
+    .flow-node.input-n {
+      background: var(--blue-bg);
+      border-color: rgba(44, 110, 181, .3);
+      color: var(--blue)
+    }
+
+    .flow-node.bms-n {
+      background: var(--gold-pale);
+      border-color: rgba(184, 137, 30, .3);
+      color: var(--gold)
+    }
+
+    .flow-node.output-n {
+      background: var(--green-bg);
+      border-color: rgba(45, 138, 95, .35);
+      color: var(--green)
+    }
+
+    .flow-arrow-c {
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.2
+    }
+
+    .charge-bar-wrap {
+      margin-top: 16px
+    }
+
+    .charge-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--mid);
+      margin-bottom: 6px;
+      font-family: 'DM Mono', monospace
+    }
+
+    .charge-bar-bg {
+      height: 8px;
+      background: var(--bg3);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 10px
+    }
+
+    .charge-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-l));
+      transition: width 1.5s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .charge-specs {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 12px
+    }
+
+    .charge-spec {
+      padding: 8px 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 11px;
+      color: var(--mid);
+      font-family: 'DM Mono', monospace
+    }
+
+    .shield-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px
+    }
+
+    .shield-item {
+      padding: 10px 14px;
+      background: var(--green-bg);
+      border: 1px solid rgba(45, 138, 95, .25);
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .upgrade-demo {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end
+    }
+
+    .upgrade-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center
+    }
+
+    .upgrade-col span {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted)
+    }
+
+    .upgrade-mod {
+      width: 44px;
+      border-radius: 3px;
+      background: linear-gradient(135deg, var(--ink2), var(--mid));
+      border: 1px solid var(--border2);
+      transition: all .3s cursor:pointer
+    }
+
+    .upgrade-mod:hover {
+      border-color: var(--gold);
+      transform: scale(1.05)
+    }
+
+    .upgrade-plus {
+      font-size: 24px;
+      color: var(--gold);
+      align-self: center
+    }
+
+    /* Progress bar below panels */
+    .how-progress {
+      display: flex;
+      gap: 4px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg3)
+    }
+
+    .how-prog-dot {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background .3s
+    }
+
+    .how-prog-dot.active {
+      background: var(--gold)
+    }
+
+    .how-prog-dot.done {
+      background: rgba(184, 137, 30, .45)
+    }
+
     /* ── SPECS ── */
     .specs-bg {
-      background: var(--charcoal)
+      background: var(--bg2)
     }
 
     .specs-layout {
@@ -519,7 +1053,7 @@
       width: 100%;
       height: 280px;
       object-fit: cover;
-      filter: brightness(.75) saturate(.7)
+      filter: brightness(.8) saturate(.85)
     }
 
     .specs-img-row {
@@ -537,35 +1071,62 @@
       width: 100%;
       height: 140px;
       object-fit: cover;
-      filter: brightness(.7) saturate(.7);
+      filter: brightness(.8) saturate(.85);
       transition: filter .3s
     }
 
     .specs-sm-img:hover img {
-      filter: brightness(.9) saturate(1)
+      filter: brightness(.95) saturate(1)
     }
 
     .specs-cards {
       display: flex;
       flex-direction: column;
-      gap: 0
+      gap: 12px
     }
 
     .spec-group {
-      background: var(--steel);
+      background: var(--panel);
       border: 1px solid var(--border);
-      margin-bottom: 12px;
       overflow: hidden
     }
 
     .spec-group-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       letter-spacing: 2px;
-      padding: 14px 20px;
-      background: var(--mid);
+      padding: 12px 20px;
+      background: var(--bg3);
       border-bottom: 1px solid var(--border);
-      color: var(--light)
+      color: var(--ink2);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: background .2s
+    }
+
+    .spec-group-title:hover {
+      background: var(--bg2)
+    }
+
+    .spec-group-title .sg-arrow {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform .3s
+    }
+
+    .spec-group.open .sg-arrow {
+      transform: rotate(180deg)
+    }
+
+    .spec-group-body {
+      display: none
+    }
+
+    .spec-group.open .spec-group-body {
+      display: block
     }
 
     .spec-row {
@@ -573,7 +1134,7 @@
       justify-content: space-between;
       align-items: baseline;
       padding: 10px 20px;
-      border-bottom: 1px solid rgba(42, 47, 54, .6);
+      border-bottom: 1px solid rgba(214, 208, 196, .5);
       font-size: 12px
     }
 
@@ -582,13 +1143,13 @@
     }
 
     .sk {
-      color: var(--silver)
+      color: var(--mid)
     }
 
     .sv {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      color: var(--white)
+      color: var(--ink2)
     }
 
     .sv.hi {
@@ -619,15 +1180,15 @@
       display: flex;
       align-items: flex-end;
       padding: 28px;
-      background: linear-gradient(transparent 40%, rgba(8, 8, 8, .8));
+      background: linear-gradient(transparent 40%, rgba(244, 241, 235, .7));
       pointer-events: none
     }
 
     .module-canvas-label {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
+      font-size: 12px;
       letter-spacing: 3px;
-      color: var(--silver)
+      color: var(--mid)
     }
 
     .modules-grid {
@@ -639,14 +1200,15 @@
 
     .mod-card {
       border: 1px solid var(--border);
-      background: var(--charcoal);
+      background: var(--panel);
       overflow: hidden;
-      transition: transform .3s, border-color .3s
+      transition: transform .3s, border-color .3s, box-shadow .3s
     }
 
     .mod-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--gold)
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 12px 32px var(--shadow2)
     }
 
     .mod-img {
@@ -658,12 +1220,12 @@
       width: 100%;
       height: 160px;
       object-fit: cover;
-      filter: brightness(.65) saturate(.7);
+      filter: brightness(.75) saturate(.8);
       transition: filter .4s
     }
 
     .mod-card:hover .mod-img img {
-      filter: brightness(.85) saturate(1)
+      filter: brightness(.9) saturate(1)
     }
 
     .mod-badge {
@@ -674,9 +1236,9 @@
       font-size: 9px;
       letter-spacing: 2px;
       color: var(--gold);
-      background: rgba(0, 0, 0, .75);
+      background: rgba(244, 241, 235, .9);
       padding: 4px 10px;
-      border: 1px solid rgba(201, 162, 39, .3)
+      border: 1px solid rgba(184, 137, 30, .35)
     }
 
     .mod-body {
@@ -686,7 +1248,7 @@
     .mod-name {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 28px;
-      color: var(--white);
+      color: var(--ink);
       margin-bottom: 2px
     }
 
@@ -699,32 +1261,35 @@
 
     .mod-wh {
       font-size: 11px;
-      color: var(--silver);
+      color: var(--muted);
       font-family: 'DM Mono', monospace;
       margin-bottom: 14px
     }
 
     .mod-bar-bg {
       height: 3px;
-      background: var(--mid);
-      margin-bottom: 12px
+      background: var(--bg3);
+      margin-bottom: 12px;
+      border-radius: 100px;
+      overflow: hidden
     }
 
     .mod-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      background: linear-gradient(90deg, var(--gold), var(--gold-l));
+      border-radius: 100px;
       transition: width 1.2s ease
     }
 
     .mod-note {
       font-size: 12px;
-      color: var(--silver);
+      color: var(--mid);
       line-height: 1.55
     }
 
     /* ── APPLICATIONS MOSAIC ── */
     .apps-section {
-      background: var(--steel)
+      background: var(--bg2)
     }
 
     .mosaic {
@@ -744,12 +1309,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.55) saturate(.75);
+      filter: brightness(.6) saturate(.8);
       transition: filter .4s, transform .5s
     }
 
     .mos-cell:hover img {
-      filter: brightness(.8) saturate(1);
+      filter: brightness(.85) saturate(1);
       transform: scale(1.06)
     }
 
@@ -768,21 +1333,21 @@
       display: flex;
       align-items: flex-end;
       padding: 18px 20px;
-      background: linear-gradient(transparent 50%, rgba(0, 0, 0, .75))
+      background: linear-gradient(transparent 50%, rgba(26, 24, 20, .75))
     }
 
     .mos-label span {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 18px;
       letter-spacing: 2px;
-      color: var(--white)
+      color: #fff
     }
 
     .mos-label em {
       font-size: 11px;
       font-style: normal;
       font-family: 'DM Mono', monospace;
-      color: var(--gold);
+      color: rgba(212, 165, 53, .85);
       display: block;
       letter-spacing: 1.5px;
       margin-bottom: 4px
@@ -797,9 +1362,14 @@
     }
 
     .flow-card {
-      background: var(--charcoal);
+      background: var(--panel);
       border: 1px solid var(--border);
-      overflow: hidden
+      overflow: hidden;
+      transition: box-shadow .3s
+    }
+
+    .flow-card:hover {
+      box-shadow: 0 8px 24px var(--shadow)
     }
 
     .flow-img {
@@ -811,7 +1381,7 @@
       width: 100%;
       height: 180px;
       object-fit: cover;
-      filter: brightness(.5) saturate(.6)
+      filter: brightness(.55) saturate(.7)
     }
 
     .flow-mode {
@@ -827,14 +1397,14 @@
 
     .flow-mode.ch {
       color: var(--blue);
-      border-color: rgba(74, 158, 255, .4);
-      background: rgba(74, 158, 255, .08)
+      border-color: rgba(44, 110, 181, .4);
+      background: var(--blue-bg)
     }
 
     .flow-mode.di {
       color: var(--green);
-      border-color: rgba(61, 220, 132, .4);
-      background: rgba(61, 220, 132, .08)
+      border-color: rgba(45, 138, 95, .4);
+      background: var(--green-bg)
     }
 
     .flow-body {
@@ -845,12 +1415,13 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 26px;
       letter-spacing: 1px;
-      margin-bottom: 4px
+      margin-bottom: 4px;
+      color: var(--ink)
     }
 
     .flow-sub {
       font-size: 12px;
-      color: var(--silver);
+      color: var(--muted);
       font-family: 'DM Mono', monospace;
       margin-bottom: 20px
     }
@@ -866,9 +1437,10 @@
       align-items: center;
       gap: 10px;
       padding: 11px 14px;
-      background: var(--steel);
+      background: var(--bg2);
       border: 1px solid var(--border);
-      font-size: 12px
+      font-size: 12px;
+      color: var(--ink2)
     }
 
     .fd {
@@ -893,7 +1465,7 @@
     .flow-arr {
       text-align: center;
       font-size: 16px;
-      color: var(--border);
+      color: var(--muted);
       padding: 2px 0
     }
 
@@ -906,15 +1478,16 @@
     }
 
     .led-card {
-      background: var(--charcoal);
+      background: var(--panel);
       border: 1px solid var(--border);
       padding: 24px 16px;
       text-align: center;
-      transition: border-color .3s
+      transition: border-color .3s, box-shadow .3s
     }
 
     .led-card:hover {
-      border-color: var(--gold)
+      border-color: var(--gold);
+      box-shadow: 0 4px 16px var(--shadow)
     }
 
     .led-dot {
@@ -931,8 +1504,8 @@
     }
 
     .lgd {
-      background: #2a9a5a;
-      color: #2a9a5a
+      background: #5aad80;
+      color: #5aad80
     }
 
     .lb {
@@ -962,14 +1535,15 @@
     .led-pct {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 18px;
-      color: var(--white);
+      color: var(--ink);
       margin-bottom: 3px
     }
 
     .led-lbl {
       font-size: 10px;
-      color: var(--silver);
-      letter-spacing: 1px
+      color: var(--muted);
+      letter-spacing: 1px;
+      font-family: 'DM Mono', monospace
     }
 
     /* ── SUSTAINABILITY ── */
@@ -982,14 +1556,15 @@
 
     .sus-card {
       border: 1px solid var(--border);
-      background: var(--charcoal);
+      background: var(--panel);
       overflow: hidden;
-      transition: border-color .3s, transform .3s
+      transition: border-color .3s, transform .3s, box-shadow .3s
     }
 
     .sus-card:hover {
       border-color: var(--green);
-      transform: translateY(-4px)
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px var(--shadow)
     }
 
     .sus-img {
@@ -1000,12 +1575,12 @@
       width: 100%;
       height: 130px;
       object-fit: cover;
-      filter: brightness(.6) saturate(.6);
+      filter: brightness(.75) saturate(.75);
       transition: filter .4s
     }
 
     .sus-card:hover .sus-img img {
-      filter: brightness(.85) saturate(1)
+      filter: brightness(.9) saturate(1)
     }
 
     .sus-body {
@@ -1021,18 +1596,19 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 18px;
       letter-spacing: 1px;
-      margin-bottom: 6px
+      margin-bottom: 6px;
+      color: var(--ink)
     }
 
     .sus-desc {
       font-size: 12px;
-      color: var(--silver);
+      color: var(--mid);
       line-height: 1.6
     }
 
     /* ── WARNINGS ── */
     .warn-bg {
-      background: var(--charcoal)
+      background: var(--bg2)
     }
 
     .warn-grid {
@@ -1044,13 +1620,14 @@
 
     .warn-card {
       padding: 20px;
-      border: 1px solid rgba(232, 69, 69, .15);
-      background: rgba(232, 69, 69, .03);
-      transition: border-color .3s
+      border: 1px solid rgba(192, 57, 43, .18);
+      background: rgba(192, 57, 43, .03);
+      transition: border-color .3s, background .3s
     }
 
     .warn-card:hover {
-      border-color: rgba(232, 69, 69, .5)
+      border-color: rgba(192, 57, 43, .5);
+      background: rgba(192, 57, 43, .06)
     }
 
     .wi {
@@ -1068,34 +1645,33 @@
 
     .wd {
       font-size: 11px;
-      color: var(--silver);
+      color: var(--mid);
       line-height: 1.55
     }
 
     /* ── FOOTER ── */
     footer {
-      background: var(--black);
-      border-top: 1px solid var(--border);
+      background: var(--ink);
+      color: var(--bg);
+      border-top: 1px solid rgba(255, 255, 255, .06);
       padding: 60px 72px;
       display: grid;
       grid-template-columns: 1.2fr 1fr 1fr;
       gap: 56px
     }
 
-    .f-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 34px;
-      letter-spacing: 3px;
-      margin-bottom: 6px
+    .f-logo-wrap {
+      margin-bottom: 12px
     }
 
-    .f-logo span {
-      color: var(--gold)
+    .f-logo-wrap .footer-logo-svg {
+      height: 40px;
+      width: auto
     }
 
     .f-tag {
       font-size: 11px;
-      color: var(--silver);
+      color: var(--muted);
       letter-spacing: 2px;
       text-transform: uppercase;
       margin-bottom: 16px
@@ -1103,17 +1679,19 @@
 
     .f-desc {
       font-size: 12px;
-      color: var(--silver);
+      color: #8a8478;
       line-height: 1.75;
       max-width: 260px
     }
 
     .f-col-t {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       letter-spacing: 2px;
-      color: var(--white);
-      margin-bottom: 18px
+      color: var(--bg);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08)
     }
 
     .f-list {
@@ -1125,16 +1703,16 @@
 
     .f-list li {
       font-size: 12px;
-      color: var(--silver)
+      color: #8a8478
     }
 
     .f-list strong {
-      color: var(--light)
+      color: #c8c2b4
     }
 
     .f-bottom {
       grid-column: 1/-1;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(255, 255, 255, .06);
       padding-top: 24px;
       display: flex;
       justify-content: space-between;
@@ -1143,7 +1721,7 @@
 
     .f-copy {
       font-size: 11px;
-      color: var(--silver)
+      color: #6b6558
     }
 
     .certs {
@@ -1155,8 +1733,8 @@
     .cert {
       font-family: 'DM Mono', monospace;
       font-size: 9px;
-      color: var(--silver);
-      border: 1px solid var(--border);
+      color: #8a8478;
+      border: 1px solid rgba(255, 255, 255, .12);
       padding: 4px 10px;
       letter-spacing: 1px
     }
@@ -1199,7 +1777,7 @@
         grid-template-columns: repeat(2, 1fr)
       }
 
-      .how-wrap,
+      .how-layout,
       .specs-layout,
       .flow-grid {
         grid-template-columns: 1fr
@@ -1241,7 +1819,23 @@
 
   <!-- NAV -->
   <nav>
-    <div class="nav-logo">Modttery<span>™</span></div>
+    <a href="#home" class="nav-logo">
+      <!-- MODTTERY LOGO SVG -->
+      <svg class="nav-logo-svg" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- M bolt icon -->
+        <rect x="0" y="4" width="32" height="32" rx="3" fill="#b8891e" />
+        <polygon points="10,8 10,21 16,21 8,34 22,34 22,21 16,21 24,8" fill="white" />
+        <!-- Wordmark -->
+        <text x="40" y="28" font-family="'Bebas Neue', sans-serif" font-size="26" fill="#1a1814"
+          letter-spacing="3">MODTTERY</text>
+        <text x="40" y="28" font-family="'Bebas Neue', sans-serif" font-size="26" fill="#1a1814" letter-spacing="3">
+          <tspan fill="#1a1814">MODT</tspan>
+          <tspan fill="#b8891e">TERY</tspan>
+        </text>
+        <!-- TM superscript -->
+        <text x="152" y="14" font-family="'DM Sans', sans-serif" font-size="8" fill="#b8891e">™</text>
+      </svg>
+    </a>
     <ul class="nav-links">
       <li><a href="#how">How It Works</a></li>
       <li><a href="#specs">Specs</a></li>
@@ -1249,18 +1843,19 @@
       <li><a href="#apps">Applications</a></li>
       <li><a href="#sustainability">Sustainability</a></li>
     </ul>
-    <div class="nav-pill">● SYSTEM READY</div>
+    <div class="nav-pill">SYSTEM READY</div>
   </nav>
 
   <!-- ══ HERO ══ -->
   <section class="hero" id="home">
     <div class="hero-glow"></div>
     <div class="hero-glow2"></div>
+    <div class="hero-pattern"></div>
     <div class="hero-left">
       <div class="hero-eyebrow">Next-Gen Modular Energy</div>
       <h1 class="hero-title">MOD<br><em>TTERY</em></h1>
       <p class="hero-sub">Modular · Smart · Sustainable</p>
-      <p class="hero-desc">A battery system inspired by building blocks. Snap modules in, the BMS handles everything
+      <p class="hero-desc">A battery system inspired by building blocks. Snap modules in — the BMS handles everything
         else.</p>
       <div class="btn-row">
         <a href="#specs" class="btn-p">View Specs</a>
@@ -1276,23 +1871,23 @@
   <!-- STATS -->
   <div class="stats-bar">
     <div class="stat">
-      <div class="stat-v">20<span class="stat-u">kWh</span></div>
+      <div class="stat-v" data-target="20">0<span class="stat-u">kWh</span></div>
       <div class="stat-l">Max Capacity</div>
     </div>
     <div class="stat">
-      <div class="stat-v">240<span class="stat-u">W</span></div>
+      <div class="stat-v" data-target="240">0<span class="stat-u">W</span></div>
       <div class="stat-l">Charge / Discharge</div>
     </div>
     <div class="stat">
-      <div class="stat-v">1000<span class="stat-u">+</span></div>
+      <div class="stat-v" data-target="1000">0<span class="stat-u">+</span></div>
       <div class="stat-l">Cycle Life</div>
     </div>
     <div class="stat">
-      <div class="stat-v">14.8<span class="stat-u">V</span></div>
+      <div class="stat-v" data-target="14.8">0<span class="stat-u">V</span></div>
       <div class="stat-l">Nominal Voltage</div>
     </div>
     <div class="stat">
-      <div class="stat-v">145<span class="stat-u">kg</span></div>
+      <div class="stat-v" data-target="145">0<span class="stat-u">kg</span></div>
       <div class="stat-l">System Weight</div>
     </div>
   </div>
@@ -1305,7 +1900,9 @@
       <div class="img-tile-label">Advanced Cell Chemistry</div>
     </div>
     <div class="img-tile">
-      <img src="https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=800&q=80" alt="Electric vehicle">
+      <img
+        src="https://hips.hearstapps.com/hmg-prod/images/2024-chevrolet-equinox-ev-3rs-194-6657c7bbc0425.jpg?crop=0.707xw:0.648xh;0.224xw,0.324xh"
+        alt="Electric vehicle">
       <div class="img-tile-tag">E-MOBILITY</div>
       <div class="img-tile-label">Built for EV & Beyond</div>
     </div>
@@ -1318,78 +1915,274 @@
 
   <div class="div"></div>
 
-  <!-- ══ HOW IT WORKS ══ -->
+  <!-- ══ HOW IT WORKS — INTERACTIVE ══ -->
   <section id="how">
     <div class="ey">Process Overview</div>
     <h2 class="st">How It Works</h2>
     <p class="sd">Six steps. Zero tools. Full intelligence.</p>
 
-    <div class="how-wrap reveal">
-      <div class="steps">
-        <div class="step">
-          <div class="step-n">01</div>
-          <div>
-            <h3>Build Your Power</h3>
-            <p>Insert modules into the tray — they click into place magnetically.</p>
+    <div class="how-layout reveal">
+      <!-- Left: steps list -->
+      <div class="how-steps" id="howSteps">
+
+        <div class="how-step active" data-step="0">
+          <div class="how-step-track">
+            <div class="how-step-num">01</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Build Your Power</div>
+            <div class="how-step-body">Insert modules into the tray — they click into place magnetically. No tools, no
+              wiring, no expertise needed.</div>
+            <div class="how-step-tag">MAGNETIC SNAP SYSTEM</div>
           </div>
         </div>
-        <div class="step">
-          <div class="step-n">02</div>
-          <div>
-            <h3>Smart Connection</h3>
-            <p>The BMS auto-detects modules, reads status, and balances cells instantly.</p>
+
+        <div class="how-step" data-step="1">
+          <div class="how-step-track">
+            <div class="how-step-num">02</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Smart Connection</div>
+            <div class="how-step-body">The BMS auto-detects modules, reads status, and balances cells instantly. It
+              speaks to each module individually.</div>
+            <div class="how-step-tag">AUTO-DETECT BMS</div>
           </div>
         </div>
-        <div class="step">
-          <div class="step-n">03</div>
-          <div>
-            <h3>Power Flow</h3>
-            <p>Voltage, current, and temperature monitored in real time across all modules.</p>
+
+        <div class="how-step" data-step="2">
+          <div class="how-step-track">
+            <div class="how-step-num">03</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Power Flow</div>
+            <div class="how-step-body">Voltage, current, and temperature monitored in real time across all modules. Data
+              flows bidirectionally over the same connector.</div>
+            <div class="how-step-tag">REAL-TIME MONITORING</div>
           </div>
         </div>
-        <div class="step">
-          <div class="step-n">04</div>
-          <div>
-            <h3>Charging</h3>
-            <p>USB-C PD 3.1 up to 240W. BMS manages safe optimized charging per module.</p>
+
+        <div class="how-step" data-step="3">
+          <div class="how-step-track">
+            <div class="how-step-num">04</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Charging</div>
+            <div class="how-step-body">CCS1/CCS2. BMS manages safe optimized charging per module — 0 to 80% in just 30
+              minutes.</div>
+            <div class="how-step-tag">CCS1/CCS2</div>
           </div>
         </div>
-        <div class="step">
-          <div class="step-n">05</div>
-          <div>
-            <h3>Safe & Protected</h3>
-            <p>Guards against overcharge, overdischarge, short circuit, and overtemperature.</p>
+
+        <div class="how-step" data-step="4">
+          <div class="how-step-track">
+            <div class="how-step-num">05</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Safe & Protected</div>
+            <div class="how-step-body">Guards against overcharge, overdischarge, short circuit, overtemperature, and
+              over-current at every module level.</div>
+            <div class="how-step-tag">6-LAYER PROTECTION</div>
           </div>
         </div>
-        <div class="step">
-          <div class="step-n">06</div>
-          <div>
-            <h3>Upgrade Anytime</h3>
-            <p>Add or swap modules on the fly. The system adapts automatically.</p>
+
+        <div class="how-step" data-step="5">
+          <div class="how-step-track">
+            <div class="how-step-num">06</div>
+            <div class="how-step-line"></div>
+          </div>
+          <div class="how-step-content">
+            <div class="how-step-title">Upgrade Anytime</div>
+            <div class="how-step-body">Add or swap modules on the fly. The system adapts automatically — no
+              reconfiguration, no downtime.</div>
+            <div class="how-step-tag">HOT-SWAP READY</div>
           </div>
         </div>
+
       </div>
 
-      <div class="anatomy-3d">
-        <canvas id="anatomy-canvas"></canvas>
-        <div class="anatomy-labels">
-          <div class="al">
-            <div class="al-dot" style="background:#c9a227"></div>Outer Shell (Al)
+      <!-- Right: visual display -->
+      <div class="how-visual">
+        <div class="how-display">
+          <div class="how-display-header">
+            <div class="how-display-dots">
+              <div class="how-display-dot hdd1"></div>
+              <div class="how-display-dot hdd2"></div>
+              <div class="how-display-dot hdd3"></div>
+            </div>
+            <div class="how-display-title" id="panelTitle">STEP 01 · BUILD YOUR POWER</div>
           </div>
-          <div class="al">
-            <div class="al-dot" style="background:#4a9eff"></div>Smart Logic Board
+
+          <div class="how-panels" id="howPanels">
+
+            <!-- Panel 0: Build Your Power -->
+            <div class="how-panel visible" data-panel="0">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--gold-pale)">🔋</div>
+                <div>
+                  <div class="panel-icon-label">Magnetic Snap</div>
+                  <div class="panel-icon-sub">INSERT · CLICK · DONE</div>
+                </div>
+              </div>
+              <div class="snap-demo" id="snapDemo">
+                <div class="snap-module" onclick="snapModule(this)">
+                  <div class="led"></div><span>M5.0</span>
+                </div>
+                <div class="snap-module" onclick="snapModule(this)">
+                  <div class="led"></div><span>M10</span>
+                </div>
+                <div class="snap-arrow">→</div>
+                <div class="snap-tray" id="snapTray"><span>DROP MODULES</span></div>
+              </div>
+              <p
+                style="font-size:12px;color:var(--muted);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:.5px">
+                ← Click a module to snap it in</p>
+            </div>
+
+            <!-- Panel 1: Smart Connection -->
+            <div class="how-panel" data-panel="1">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--blue-bg)">🧠</div>
+                <div>
+                  <div class="panel-icon-label">Auto-Detect BMS</div>
+                  <div class="panel-icon-sub">INSTANT · INTELLIGENT</div>
+                </div>
+              </div>
+              <div class="bms-grid">
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--green)"></div>Module count detected<span
+                    class="bms-check" style="margin-left:auto">✓</span>
+                </div>
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--green)"></div>Cell status read<span class="bms-check"
+                    style="margin-left:auto">✓</span>
+                </div>
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--gold)"></div>Cell balancing active<span
+                    style="margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">●</span>
+                </div>
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--blue)"></div>Firmware version synced<span
+                    class="bms-check" style="margin-left:auto">✓</span>
+                </div>
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--green)"></div>Capacity calculated<span class="bms-check"
+                    style="margin-left:auto">✓</span>
+                </div>
+                <div class="bms-item">
+                  <div class="bms-dot" style="background:var(--green)"></div>System ready<span class="bms-check"
+                    style="margin-left:auto">✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2: Power Flow -->
+            <div class="how-panel" data-panel="2">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--gold-pale)">⚡</div>
+                <div>
+                  <div class="panel-icon-label">Live Power Flow</div>
+                  <div class="panel-icon-sub">VOLTAGE · CURRENT · TEMP</div>
+                </div>
+              </div>
+              <div class="flow-anim">
+                <div class="flow-node input-n">→ 14.8V · 16.2A · 239.8W</div>
+                <div class="flow-arrow-c">↕</div>
+                <div class="flow-node bms-n">BMS — Protection · Balancing · Monitoring</div>
+                <div class="flow-arrow-c">↓↓↓</div>
+                <div class="flow-node output-n">M1: 14.7V · M2: 14.8V · M3: 14.8V</div>
+              </div>
+            </div>
+
+            <!-- Panel 3: Charging -->
+            <div class="how-panel" data-panel="3">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--blue-bg)">🔌</div>
+                <div>
+                  <div class="panel-icon-label">Fast Charge</div>
+                  <div class="panel-icon-sub">0→80% IN 30 MINUTES</div>
+                </div>
+              </div>
+              <div class="charge-bar-wrap">
+                <div class="charge-bar-label"><span>State of Charge</span><span id="chargePercent">0%</span></div>
+                <div class="charge-bar-bg">
+                  <div class="charge-bar-fill" id="chargeBar" style="width:0%"></div>
+                </div>
+                <div class="charge-bar-label"><span style="color:var(--muted)">Charging via CCS1/CCS2</span><span
+                    style="color:var(--green)">● ACTIVE</span></div>
+              </div>
+              <div class="charge-specs">
+                <div class="charge-spec">240W MAX</div>
+                <div class="charge-spec">PD 3.1</div>
+                <div class="charge-spec">CC/CV</div>
+                <div class="charge-spec">PER-MODULE CTRL</div>
+              </div>
+            </div>
+
+            <!-- Panel 4: Protection -->
+            <div class="how-panel" data-panel="4">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--green-bg)">🛡️</div>
+                <div>
+                  <div class="panel-icon-label">6-Layer Safety</div>
+                  <div class="panel-icon-sub">ALL ACTIVE · ALL CLEAR</div>
+                </div>
+              </div>
+              <div class="shield-grid">
+                <div class="shield-item">⚡ Overcharge</div>
+                <div class="shield-item">🔋 Overdischarge</div>
+                <div class="shield-item">🔥 Overtemperature</div>
+                <div class="shield-item">⚠️ Short Circuit</div>
+                <div class="shield-item">📊 Over-Current</div>
+                <div class="shield-item">🔗 Cell Imbalance</div>
+              </div>
+            </div>
+
+            <!-- Panel 5: Upgrade Anytime -->
+            <div class="how-panel" data-panel="5">
+              <div class="panel-icon-row">
+                <div class="panel-icon" style="background:var(--gold-pale)">🔄</div>
+                <div>
+                  <div class="panel-icon-label">Hot-Swap Ready</div>
+                  <div class="panel-icon-sub">ADD · REMOVE · UPGRADE</div>
+                </div>
+              </div>
+              <div class="upgrade-demo">
+                <div class="upgrade-col">
+                  <div class="upgrade-mod" style="height:44px"></div>
+                  <div class="upgrade-mod" style="height:60px"></div>
+                  <span>Before</span>
+                </div>
+                <div class="upgrade-plus">→</div>
+                <div class="upgrade-col">
+                  <div class="upgrade-mod" style="height:44px"></div>
+                  <div class="upgrade-mod" style="height:60px"></div>
+                  <div class="upgrade-mod" style="height:80px;border-color:var(--gold)"></div>
+                  <span style="color:var(--gold)">After</span>
+                </div>
+                <div style="flex:1;padding-left:16px">
+                  <p style="font-size:12px;color:var(--mid);line-height:1.7">Add an M10 module mid-session. The BMS
+                    auto-recalculates total capacity and redistributes load.</p>
+                  <div style="margin-top:12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)">+ 148Wh
+                    added online</div>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div class="al">
-            <div class="al-dot" style="background:#3ddc84"></div>Battery Modules
-          </div>
-          <div class="al">
-            <div class="al-dot" style="background:#e84545"></div>Connectors
-          </div>
-          <div class="al">
-            <div class="al-dot" style="background:#aaaaaa"></div>Cooling Channels
-          </div>
-          <div class="al">
-            <div class="al-dot" style="background:#7a8490"></div>Base Tray (Al)
+
+          <!-- Progress dots -->
+          <div class="how-progress" id="howProgress">
+            <div class="how-prog-dot active" onclick="setStep(0)"></div>
+            <div class="how-prog-dot" onclick="setStep(1)"></div>
+            <div class="how-prog-dot" onclick="setStep(2)"></div>
+            <div class="how-prog-dot" onclick="setStep(3)"></div>
+            <div class="how-prog-dot" onclick="setStep(4)"></div>
+            <div class="how-prog-dot" onclick="setStep(5)"></div>
           </div>
         </div>
       </div>
@@ -1402,54 +2195,43 @@
   <section id="specs" class="specs-bg">
     <div class="ey">Technical Data</div>
     <h2 class="st">Full Specifications</h2>
-    <p class="sd">Engineering-grade numbers, every row.</p>
+    <p class="sd">Engineering-grade numbers, every row. Click a category to expand.</p>
 
     <div class="specs-layout reveal">
-      <div class="specs-img-col">
-        <div class="specs-big-img">
-          <img src="https://images.unsplash.com/photo-1620714223084-8fcacc2dfd4d?w=800&q=80" alt="Battery pack detail">
-          <div
-            style="position:absolute;bottom:14px;left:14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold)">
-            DIE-CAST ALUMINUM (ADC12)</div>
-        </div>
-        <div class="specs-img-row">
-          <div class="specs-sm-img"><img src="https://images.unsplash.com/photo-1636761404084-d5e77a9a0e80?w=400&q=80"
-              alt="BMS board"></div>
-          <div class="specs-sm-img"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"
-              alt="USB-C connector"></div>
-        </div>
-        <div class="specs-img-row">
-          <div class="specs-sm-img"><img src="https://images.unsplash.com/photo-1606222040226-13d1d08ca50b?w=400&q=80"
-              alt="Cooling system"></div>
-          <div class="specs-sm-img"><img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&q=80"
-              alt="Circuit board"></div>
-        </div>
-      </div>
 
       <div class="specs-cards">
-        <div class="spec-group">
-          <div class="spec-group-title">Electrical</div>
-          <div class="spec-row"><span class="sk">System Capacity</span><span class="sv hi">20 kWh</span></div>
-          <div class="spec-row"><span class="sk">Nominal Voltage</span><span class="sv hi">14.8 V (4S)</span></div>
-          <div class="spec-row"><span class="sk">Voltage Range</span><span class="sv">12 – 16.8 V</span></div>
-          <div class="spec-row"><span class="sk">Charging Power</span><span class="sv hi">240 W max</span></div>
-          <div class="spec-row"><span class="sk">Discharging Power</span><span class="sv hi">240 W max</span></div>
+        <div class="spec-group open">
+          <div class="spec-group-title" onclick="toggleSpec(this)">Electrical <span class="sg-arrow">▲</span></div>
+          <div class="spec-group-body">
+            <div class="spec-row"><span class="sk">System Capacity</span><span class="sv hi">20 kWh</span></div>
+            <div class="spec-row"><span class="sk">Nominal Voltage</span><span class="sv hi">14.8 V (4S)</span></div>
+            <div class="spec-row"><span class="sk">Voltage Range</span><span class="sv">12 – 16.8 V</span></div>
+            <div class="spec-row"><span class="sk">Charging Power</span><span class="sv hi">240 W max</span></div>
+            <div class="spec-row"><span class="sk">Discharging Power</span><span class="sv hi">240 W max</span></div>
+          </div>
         </div>
         <div class="spec-group">
-          <div class="spec-group-title">Physical</div>
-          <div class="spec-row"><span class="sk">Dimensions (L×W×H)</span><span class="sv">2800×2000×460 mm</span></div>
-          <div class="spec-row"><span class="sk">System Weight</span><span class="sv hi">145 kg</span></div>
-          <div class="spec-row"><span class="sk">Weight / Module</span><span class="sv">17.5 kg</span></div>
-          <div class="spec-row"><span class="sk">Shell</span><span class="sv">Die-cast Al (ADC12)</span></div>
-          <div class="spec-row"><span class="sk">Cooling</span><span class="sv">Vapor Chamber + Liquid/Air</span></div>
+          <div class="spec-group-title" onclick="toggleSpec(this)">Physical <span class="sg-arrow">▼</span></div>
+          <div class="spec-group-body">
+            <div class="spec-row"><span class="sk">Dimensions (L×W×H)</span><span class="sv">2800×2000×460 mm</span>
+            </div>
+            <div class="spec-row"><span class="sk">System Weight</span><span class="sv hi">145 kg</span></div>
+            <div class="spec-row"><span class="sk">Weight / Module</span><span class="sv">17.5 kg</span></div>
+            <div class="spec-row"><span class="sk">Shell</span><span class="sv">Die-cast Al (ADC12)</span></div>
+            <div class="spec-row"><span class="sk">Cooling</span><span class="sv">Vapor Chamber + Liquid/Air</span>
+            </div>
+          </div>
         </div>
         <div class="spec-group">
-          <div class="spec-group-title">Performance</div>
-          <div class="spec-row"><span class="sk">0→80% Charge</span><span class="sv hi">30 min</span></div>
-          <div class="spec-row"><span class="sk">Cycle Life</span><span class="sv hi">1000+ @ 80% retention</span></div>
-          <div class="spec-row"><span class="sk">Operating Temp.</span><span class="sv">-20°C to 60°C</span></div>
-          <div class="spec-row"><span class="sk">Certifications</span><span class="sv">CE · FCC · UN38.3 · RoHS · REACH
-              · ISO 14001</span></div>
+          <div class="spec-group-title" onclick="toggleSpec(this)">Performance <span class="sg-arrow">▼</span></div>
+          <div class="spec-group-body">
+            <div class="spec-row"><span class="sk">0→80% Charge</span><span class="sv hi">30 min</span></div>
+            <div class="spec-row"><span class="sk">Cycle Life</span><span class="sv hi">1000+ @ 80% retention</span>
+            </div>
+            <div class="spec-row"><span class="sk">Operating Temp.</span><span class="sv">-20°C to 60°C</span></div>
+            <div class="spec-row"><span class="sk">Certifications</span><span class="sv">CE · FCC · UN38.3 · RoHS</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1478,7 +2260,7 @@
         </div>
         <div class="mod-body">
           <div class="mod-name">M2.5</div>
-          <div class="mod-cap">2.5<span style="font-size:18px;color:var(--silver)">Ah</span></div>
+          <div class="mod-cap">2.5<span style="font-size:18px;color:var(--muted)">Ah</span></div>
           <div class="mod-wh">37Wh per module</div>
           <div class="mod-bar-bg">
             <div class="mod-bar-fill" style="width:25%"></div>
@@ -1493,7 +2275,7 @@
         </div>
         <div class="mod-body">
           <div class="mod-name">M5.0</div>
-          <div class="mod-cap">5.0<span style="font-size:18px;color:var(--silver)">Ah</span></div>
+          <div class="mod-cap">5.0<span style="font-size:18px;color:var(--muted)">Ah</span></div>
           <div class="mod-wh">74Wh per module</div>
           <div class="mod-bar-bg">
             <div class="mod-bar-fill" style="width:50%"></div>
@@ -1508,7 +2290,7 @@
         </div>
         <div class="mod-body">
           <div class="mod-name">M10</div>
-          <div class="mod-cap">10<span style="font-size:18px;color:var(--silver)">Ah</span></div>
+          <div class="mod-cap">10<span style="font-size:18px;color:var(--muted)">Ah</span></div>
           <div class="mod-wh">148Wh per module</div>
           <div class="mod-bar-bg">
             <div class="mod-bar-fill" style="width:100%"></div>
@@ -1577,10 +2359,10 @@
         </div>
         <div class="flow-body">
           <div class="flow-title">Power In</div>
-          <div class="flow-sub">CCS1 (North America) and CCS2 (Europe)</div>
+          <div class="flow-sub">CCS1/CCS2</div>
           <div class="flow-nodes">
             <div class="fn">
-              <div class="fd fd-b"></div>CCS1 (North America) and CCS2 (Europe)
+              <div class="fd fd-b"></div>CCS1/CCS2
             </div>
             <div class="flow-arr">↓</div>
             <div class="fn">
@@ -1600,7 +2382,7 @@
         </div>
         <div class="flow-body">
           <div class="flow-title">Power Out</div>
-          <div class="flow-sub">CCS1 (North America) and CCS2 (Europe)</div>
+          <div class="flow-sub">CCS1/CCS2</div>
           <div class="flow-nodes">
             <div class="fn">
               <div class="fd fd-g"></div>Module 1 · Module 2 · … N
@@ -1611,7 +2393,7 @@
             </div>
             <div class="flow-arr">↓</div>
             <div class="fn">
-              <div class="fd fd-g"></div>USB-C Output (240W)
+              <div class="fd fd-g"></div>CCS1/CCS2 Output
             </div>
           </div>
         </div>
@@ -1633,17 +2415,17 @@
         <div class="led-lbl">4 Solid Green</div>
       </div>
       <div class="led-card">
-        <div class="led-dot lg" style="opacity:.8"></div>
+        <div class="led-dot lgd" style="opacity:.85"></div>
         <div class="led-pct">51–75%</div>
         <div class="led-lbl">3 Solid Green</div>
       </div>
       <div class="led-card">
-        <div class="led-dot lgd"></div>
+        <div class="led-dot lgd" style="opacity:.65"></div>
         <div class="led-pct">26–50%</div>
         <div class="led-lbl">2 Solid Green</div>
       </div>
       <div class="led-card">
-        <div class="led-dot lgd" style="opacity:.7"></div>
+        <div class="led-dot lgd" style="opacity:.45"></div>
         <div class="led-pct">6–25%</div>
         <div class="led-lbl">1 Solid Green</div>
       </div>
@@ -1727,7 +2509,7 @@
       <div class="warn-card">
         <div class="wi">🔌</div>
         <div class="wt">Approved Chargers Only</div>
-        <div class="wd">Use USB-C PD 3.1 up to 240W only.</div>
+        <div class="wd">Use CCS1/CCS2 charging ports.</div>
       </div>
       <div class="warn-card">
         <div class="wi">💧</div>
@@ -1760,7 +2542,17 @@
   <!-- ══ FOOTER ══ -->
   <footer>
     <div>
-      <div class="f-logo">Modttery<span>™</span></div>
+      <div class="f-logo-wrap">
+        <svg class="footer-logo-svg" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="4" width="32" height="32" rx="3" fill="#b8891e" />
+          <polygon points="10,8 10,21 16,21 8,34 22,34 22,21 16,21 24,8" fill="white" />
+          <text x="40" y="28" font-family="'Bebas Neue', sans-serif" font-size="26" fill="#edeae2" letter-spacing="3">
+            <tspan fill="#edeae2">MODT</tspan>
+            <tspan fill="#b8891e">TERY</tspan>
+          </text>
+          <text x="152" y="14" font-family="'DM Sans', sans-serif" font-size="8" fill="#b8891e">™</text>
+        </svg>
+      </div>
       <div class="f-tag">Power, built smarter.</div>
       <p class="f-desc">Next-generation modular battery system. Designed for EV, Robotics, Drones, Power Tools &
         Electronics.</p>
@@ -1768,8 +2560,8 @@
     <div>
       <div class="f-col-t">Connectivity</div>
       <ul class="f-list">
-        <li><strong>Charging:</strong> USB-C PD 3.1 · 240W</li>
-        <li><strong>Discharging:</strong> USB-C 3.1 · 240W</li>
+        <li><strong>Charging:</strong> CCS1/CCS2W</li>
+        <li><strong>Discharging:</strong> CCS1/CCS2</li>
         <li><strong>Data:</strong> USB Heavy Duty (Power + Data)</li>
         <li><strong>BMS:</strong> OTA App Updates</li>
       </ul>
@@ -1798,6 +2590,144 @@
   </footer>
 
   <script>
+    /* ════════════════════════════
+       HOW IT WORKS — INTERACTIVE
+    ════════════════════════════ */
+    const stepTitles = [
+      'STEP 01 · BUILD YOUR POWER',
+      'STEP 02 · SMART CONNECTION',
+      'STEP 03 · POWER FLOW',
+      'STEP 04 · CHARGING',
+      'STEP 05 · SAFE & PROTECTED',
+      'STEP 06 · UPGRADE ANYTIME'
+    ];
+
+    let currentStep = 0;
+    let chargeInterval = null;
+
+    function setStep(n) {
+      const steps = document.querySelectorAll('.how-step');
+      const panels = document.querySelectorAll('.how-panel');
+      const dots = document.querySelectorAll('.how-prog-dot');
+
+      steps.forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        if (i === n) s.classList.add('active');
+        if (i < n) s.classList.add('done');
+      });
+      panels.forEach((p, i) => { p.classList.toggle('visible', i === n); });
+      dots.forEach((d, i) => {
+        d.classList.remove('active', 'done');
+        if (i === n) d.classList.add('active');
+        if (i < n) d.classList.add('done');
+      });
+      document.getElementById('panelTitle').textContent = stepTitles[n];
+      currentStep = n;
+
+      // Trigger charge animation on step 3
+      if (n === 3) startChargeAnim();
+      else stopChargeAnim();
+    }
+
+    function startChargeAnim() {
+      const bar = document.getElementById('chargeBar');
+      const pct = document.getElementById('chargePercent');
+      let v = 0;
+      bar.style.width = '0%';
+      pct.textContent = '0%';
+      stopChargeAnim();
+      chargeInterval = setInterval(() => {
+        v = Math.min(v + 1.2, 82);
+        bar.style.width = v + '%';
+        pct.textContent = Math.round(v) + '%';
+        if (v >= 82) stopChargeAnim();
+      }, 40);
+    }
+    function stopChargeAnim() {
+      if (chargeInterval) { clearInterval(chargeInterval); chargeInterval = null; }
+    }
+
+    // Click on steps
+    document.querySelectorAll('.how-step').forEach((s, i) => {
+      s.addEventListener('click', () => setStep(i));
+    });
+
+    // Auto-advance every 5s
+    let autoAdv = setInterval(() => {
+      setStep((currentStep + 1) % 6);
+    }, 5500);
+
+    // Pause auto-advance on manual interaction
+    document.getElementById('howSteps').addEventListener('click', () => {
+      clearInterval(autoAdv);
+    });
+    document.getElementById('howProgress').addEventListener('click', () => {
+      clearInterval(autoAdv);
+    });
+
+    // Snap module demo
+    let snappedCount = 0;
+    function snapModule(el) {
+      const tray = document.getElementById('snapTray');
+      if (snappedCount >= 3) { snappedCount = 0; tray.innerHTML = '<span>DROP MODULES</span>'; tray.style.background = 'var(--gold-pale)'; }
+      el.style.transform = 'translateY(-8px) scale(1.05)';
+      el.style.borderColor = 'var(--gold)';
+      snappedCount++;
+      tray.style.background = 'rgba(45,138,95,.1)';
+      tray.style.borderColor = 'var(--green)';
+      tray.innerHTML = `<span style="color:var(--green);letter-spacing:1px;font-family:'DM Mono',monospace;font-size:11px">${snappedCount} MODULE${snappedCount > 1 ? 'S' : ''} LOCKED ✓</span>`;
+      setTimeout(() => {
+        el.style.transform = '';
+        el.style.borderColor = '';
+      }, 600);
+    }
+
+    /* ════════════════════════
+       SPEC GROUP ACCORDION
+    ════════════════════════ */
+    function toggleSpec(header) {
+      const group = header.parentElement;
+      const arrow = header.querySelector('.sg-arrow');
+      const isOpen = group.classList.contains('open');
+      // close all
+      document.querySelectorAll('.spec-group').forEach(g => {
+        g.classList.remove('open');
+        g.querySelector('.sg-arrow').textContent = '▼';
+      });
+      if (!isOpen) {
+        group.classList.add('open');
+        arrow.textContent = '▲';
+      }
+    }
+
+    /* ════════════════════════
+       STAT COUNTER ANIMATION
+    ════════════════════════ */
+    function animateCounters() {
+      document.querySelectorAll('.stat-v[data-target]').forEach(el => {
+        const target = parseFloat(el.getAttribute('data-target'));
+        const unit = el.querySelector('.stat-u').outerHTML;
+        const isFloat = target % 1 !== 0;
+        let current = 0;
+        const duration = 1400;
+        const step = target / (duration / 16);
+        const id = setInterval(() => {
+          current = Math.min(current + step, target);
+          el.innerHTML = (isFloat ? current.toFixed(1) : Math.round(current)) + unit;
+          if (current >= target) clearInterval(id);
+        }, 16);
+      });
+    }
+    let countersRun = false;
+    const statObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !countersRun) {
+        countersRun = true;
+        animateCounters();
+        statObs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    statObs.observe(document.querySelector('.stats-bar'));
+
     /* ════════════════════════════════════════
        THREE.JS — HERO 3D Battery Pack
     ════════════════════════════════════════ */
@@ -1816,131 +2746,89 @@
       camera.position.set(4, 2.5, 6);
       camera.lookAt(0, 0, 0);
 
-      // Lights
-      const amb = new THREE.AmbientLight(0xffffff, 0.3);
+      const amb = new THREE.AmbientLight(0xffffff, 0.55);
       scene.add(amb);
-      const key = new THREE.DirectionalLight(0xfff5d0, 1.4);
-      key.position.set(5, 8, 5);
-      key.castShadow = true;
-      scene.add(key);
-      const fill = new THREE.DirectionalLight(0x4a9eff, 0.5);
-      fill.position.set(-6, 2, -4);
-      scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xc9a227, 0.8);
-      rim.position.set(0, -3, -6);
-      scene.add(rim);
+      const key = new THREE.DirectionalLight(0xfff8e0, 1.4);
+      key.position.set(5, 8, 5); key.castShadow = true; scene.add(key);
+      const fill = new THREE.DirectionalLight(0xd0e4ff, 0.5);
+      fill.position.set(-6, 2, -4); scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xc9a227, 0.7);
+      rim.position.set(0, -3, -6); scene.add(rim);
 
-      // Materials
-      const matShell = new THREE.MeshStandardMaterial({ color: 0x2a2e34, metalness: .85, roughness: .25 });
-      const matGold = new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: .9, roughness: .15 });
-      const matModule = new THREE.MeshStandardMaterial({ color: 0x1a1e24, metalness: .6, roughness: .4 });
-      const matGreen = new THREE.MeshStandardMaterial({ color: 0x3ddc84, metalness: .3, roughness: .5, emissive: 0x3ddc84, emissiveIntensity: .3 });
-      const matConnector = new THREE.MeshStandardMaterial({ color: 0x111316, metalness: .9, roughness: .1 });
+      const matShell = new THREE.MeshStandardMaterial({ color: 0x8a8070, metalness: .85, roughness: .2 });
+      const matGold = new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .12 });
+      const matModule = new THREE.MeshStandardMaterial({ color: 0x2a2620, metalness: .6, roughness: .4 });
+      const matGreen = new THREE.MeshStandardMaterial({ color: 0x2d8a5f, metalness: .3, roughness: .5, emissive: 0x2d8a5f, emissiveIntensity: .4 });
+      const matConn = new THREE.MeshStandardMaterial({ color: 0x4a4540, metalness: .9, roughness: .1 });
 
       const group = new THREE.Group();
       scene.add(group);
 
-      // --- Outer shell (main body)
       const shellGeo = new THREE.BoxGeometry(3.6, 0.55, 2.2);
       const shell = new THREE.Mesh(shellGeo, matShell);
-      shell.position.y = 0.28;
-      shell.castShadow = true;
+      shell.position.y = 0.28; shell.castShadow = true;
       group.add(shell);
 
-      // Shell edge chamfer strips (decorative)
       const edgeGeo = new THREE.BoxGeometry(3.62, 0.06, 0.06);
-      const edgeMat = new THREE.MeshStandardMaterial({ color: 0x404850, metalness: .9, roughness: .1 });
-      [-0.27, 0.28 + 0.27].forEach(y => {
+      const edgeMat = new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .1 });
+      [-0.27, 0.55].forEach(y => {
         [-1.1, 1.1].forEach(z => {
-          const e = new THREE.Mesh(edgeGeo, edgeMat);
-          e.position.set(0, y, z); group.add(e);
+          const e = new THREE.Mesh(edgeGeo, edgeMat); e.position.set(0, y, z); group.add(e);
         });
       });
 
-      // --- Battery modules (3 stacked bars)
       const modPositions = [-0.9, 0, 0.9];
-      const modColors = [0x1e2860, 0x1a3040, 0x182030];
+      const modColors = [0x3a3528, 0x302c22, 0x28241c];
       modPositions.forEach((xPos, i) => {
         const mGeo = new THREE.BoxGeometry(1.05, 0.38, 1.9);
         const mMat = new THREE.MeshStandardMaterial({ color: modColors[i], metalness: .55, roughness: .45 });
         const mod = new THREE.Mesh(mGeo, mMat);
-        mod.position.set(xPos, 0.28, 0);
-        mod.castShadow = true;
+        mod.position.set(xPos, 0.28, 0); mod.castShadow = true;
         group.add(mod);
-
-        // Gold connector clips on each module
         [-.5, .5].forEach(zOff => {
           const clipGeo = new THREE.BoxGeometry(0.22, 0.12, 0.12);
           const clip = new THREE.Mesh(clipGeo, matGold);
-          clip.position.set(xPos, 0.52, zOff);
-          group.add(clip);
+          clip.position.set(xPos, 0.52, zOff); group.add(clip);
         });
-
-        // LED indicator dot
         const ledGeo = new THREE.SphereGeometry(0.045, 8, 8);
-        const ledMat = new THREE.MeshStandardMaterial({ color: 0x3ddc84, emissive: 0x3ddc84, emissiveIntensity: .9 });
-        const led = new THREE.Mesh(ledGeo, ledMat);
-        led.position.set(xPos + 0.38, 0.48, -.85);
-        group.add(led);
+        const led = new THREE.Mesh(ledGeo, matGreen);
+        led.position.set(xPos + 0.38, 0.48, -.85); group.add(led);
       });
 
-      // --- BMS board (top, slightly elevated)
       const bmsGeo = new THREE.BoxGeometry(2.8, 0.06, 1.6);
-      const bmsMat = new THREE.MeshStandardMaterial({ color: 0x0d2010, metalness: .3, roughness: .6 });
+      const bmsMat = new THREE.MeshStandardMaterial({ color: 0x1a2a18, metalness: .3, roughness: .6 });
       const bms = new THREE.Mesh(bmsGeo, bmsMat);
-      bms.position.set(0, 0.61, 0);
-      group.add(bms);
+      bms.position.set(0, 0.61, 0); group.add(bms);
 
-      // BMS chips
       [[-.9, .12], [0, .09], [.7, .11], [-.3, .08]].forEach(([x, z]) => {
         const chipGeo = new THREE.BoxGeometry(.14, .04, .14);
-        const chipMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: .8, roughness: .2 });
+        const chipMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, metalness: .8, roughness: .2 });
         const chip = new THREE.Mesh(chipGeo, chipMat);
-        chip.position.set(x, 0.65, z);
-        group.add(chip);
+        chip.position.set(x, 0.65, z); group.add(chip);
       });
 
-      // --- Output connector (side)
       const connGeo = new THREE.BoxGeometry(0.18, 0.28, 0.55);
-      const conn = new THREE.Mesh(connGeo, matConnector);
-      conn.position.set(1.89, 0.22, 0.5);
-      group.add(conn);
+      const conn = new THREE.Mesh(connGeo, matConn);
+      conn.position.set(1.89, 0.22, 0.5); group.add(conn);
 
-      // USB-C port detail
       const usbGeo = new THREE.BoxGeometry(0.04, 0.1, 0.22);
       const usb = new THREE.Mesh(usbGeo, matGold);
-      usb.position.set(1.98, 0.22, 0.5);
-      group.add(usb);
+      usb.position.set(1.98, 0.22, 0.5); group.add(usb);
 
-      // --- QR code placeholder (etched square on side)
-      const qrGeo = new THREE.BoxGeometry(0.03, 0.28, 0.28);
-      const qrMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, metalness: .3, roughness: .8 });
-      const qr = new THREE.Mesh(qrGeo, qrMat);
-      qr.position.set(1.82, 0.28, -.7);
-      group.add(qr);
-
-      // Screw heads on top corners
       [[-1.65, -.95], [-1.65, .95], [1.65, -.95], [1.65, .95]].forEach(([x, z]) => {
         const screwGeo = new THREE.CylinderGeometry(.04, .04, .06, 8);
         const screw = new THREE.Mesh(screwGeo, edgeMat);
-        screw.position.set(x, 0.59, z);
-        group.add(screw);
+        screw.position.set(x, 0.59, z); group.add(screw);
       });
 
-      // Floor plane (shadow catcher)
       const floorGeo = new THREE.PlaneGeometry(20, 20);
-      const floorMat = new THREE.ShadowMaterial({ opacity: .18 });
+      const floorMat = new THREE.ShadowMaterial({ opacity: .1 });
       const floor = new THREE.Mesh(floorGeo, floorMat);
-      floor.rotation.x = -Math.PI / 2;
-      floor.position.y = -0.1;
-      floor.receiveShadow = true;
+      floor.rotation.x = -Math.PI / 2; floor.position.y = -0.1; floor.receiveShadow = true;
       scene.add(floor);
 
-      // Orbit controls (manual)
       let isDragging = false, prevMX = 0, prevMY = 0;
-      let rotX = 0.18, rotY = -0.3;
-      let targetRotX = rotX, targetRotY = rotY;
-
+      let rotX = 0.18, rotY = -0.3, targetRotX = 0.18, targetRotY = -0.3;
       canvas.addEventListener('mousedown', e => { isDragging = true; prevMX = e.clientX; prevMY = e.clientY; });
       window.addEventListener('mouseup', () => isDragging = false);
       window.addEventListener('mousemove', e => {
@@ -1950,8 +2838,6 @@
         targetRotX = Math.max(-0.6, Math.min(0.8, targetRotX));
         prevMX = e.clientX; prevMY = e.clientY;
       });
-
-      // Touch support
       canvas.addEventListener('touchstart', e => { isDragging = true; prevMX = e.touches[0].clientX; prevMY = e.touches[0].clientY; }, { passive: true });
       canvas.addEventListener('touchend', () => isDragging = false);
       canvas.addEventListener('touchmove', e => {
@@ -1959,44 +2845,27 @@
         targetRotY += (e.touches[0].clientX - prevMX) * 0.008;
         prevMX = e.touches[0].clientX;
       }, { passive: true });
-
-      // Zoom
       let zoom = 6;
-      canvas.addEventListener('wheel', e => {
-        zoom = Math.max(3.5, Math.min(10, zoom + e.deltaY * 0.01));
-      }, { passive: true });
+      canvas.addEventListener('wheel', e => { zoom = Math.max(3.5, Math.min(10, zoom + e.deltaY * 0.01)); }, { passive: true });
 
       let t = 0;
       function animate() {
         requestAnimationFrame(animate);
         t += 0.012;
-
-        // Smooth rotation
         rotX += (targetRotX - rotX) * 0.08;
         rotY += (targetRotY - rotY) * 0.08;
-
-        // Auto-rotate when not dragging
         if (!isDragging) targetRotY += 0.003;
-
         group.rotation.x = rotX;
         group.rotation.y = rotY;
-
-        // Floating bob
         group.position.y = Math.sin(t * 0.5) * 0.05;
-
-        // Camera zoom
         const dir = camera.position.clone().normalize();
         camera.position.copy(dir.multiplyScalar(zoom));
-
         renderer.render(scene, camera);
       }
       animate();
-
       window.addEventListener('resize', () => {
         const W2 = canvas.parentElement.clientWidth;
-        camera.aspect = W2 / H;
-        camera.updateProjectionMatrix();
-        renderer.setSize(W2, H);
+        camera.aspect = W2 / H; camera.updateProjectionMatrix(); renderer.setSize(W2, H);
       });
     })();
 
@@ -2004,63 +2873,7 @@
        THREE.JS — ANATOMY exploded view
     ════════════════════════════════════════ */
     (function () {
-      const canvas = document.getElementById('anatomy-canvas');
-      const W = canvas.parentElement.clientWidth, H = 400;
-      canvas.width = W; canvas.height = H;
-
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setSize(W, H);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(44, W / H, 0.1, 100);
-      camera.position.set(3, 2.5, 5);
-      camera.lookAt(0, 0.5, 0);
-
-      const amb = new THREE.AmbientLight(0xffffff, 0.4);
-      scene.add(amb);
-      const key = new THREE.DirectionalLight(0xfff5d0, 1.2);
-      key.position.set(4, 6, 4); scene.add(key);
-      const fill = new THREE.DirectionalLight(0x4a9eff, 0.4);
-      fill.position.set(-4, 1, -3); scene.add(fill);
-
-      const parts = [
-        { geo: new THREE.BoxGeometry(2.8, 0.1, 1.8), color: 0xc9a227, y: 2.0, label: 'Shell' },
-        { geo: new THREE.BoxGeometry(2.4, 0.08, 1.5), color: 0x0d3020, y: 1.4, label: 'BMS' },
-        { geo: new THREE.BoxGeometry(2.6, 0.28, 1.6), color: 0x1e2860, y: 0.85, label: 'Modules' },
-        { geo: new THREE.BoxGeometry(2.6, 0.08, 1.6), color: 0xe84545, y: 0.42, label: 'Connectors' },
-        { geo: new THREE.BoxGeometry(2.6, 0.1, 1.6), color: 0x888888, y: 0.16, label: 'Cooling' },
-        { geo: new THREE.BoxGeometry(2.8, 0.1, 1.8), color: 0x3a3f45, y: -0.08, label: 'Base' },
-      ];
-
-      const meshes = parts.map(p => {
-        const mat = new THREE.MeshStandardMaterial({ color: p.color, metalness: .7, roughness: .3, transparent: true, opacity: .88 });
-        const mesh = new THREE.Mesh(p.geo, mat);
-        mesh.position.y = p.y;
-        scene.add(mesh);
-        return mesh;
-      });
-
-      let t = 0;
-      function animate() {
-        requestAnimationFrame(animate);
-        t += 0.008;
-        meshes.forEach((m, i) => {
-          m.rotation.y = Math.sin(t * 0.4) * 0.15;
-          // subtle breathing separation
-          const base = parts[i].y;
-          m.position.y = base + Math.sin(t + i * 0.6) * 0.03;
-        });
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        const W2 = canvas.parentElement.clientWidth;
-        camera.aspect = W2 / H;
-        camera.updateProjectionMatrix();
-        renderer.setSize(W2, H);
-      });
+      const canvas = document.createElement('canvas'); // not used here, anatomy removed from how
     })();
 
     /* ════════════════════════════════════════
@@ -2074,65 +2887,50 @@
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setSize(W, H);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setClearColor(0x191c20, 1);
+      renderer.setClearColor(0xe5e1d7, 1);
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x191c20, 12, 22);
+      scene.fog = new THREE.Fog(0xe5e1d7, 12, 22);
 
       const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
       camera.position.set(0, 2.5, 9);
       camera.lookAt(0, 0, 0);
 
-      const amb = new THREE.AmbientLight(0xffffff, 0.35);
+      const amb = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(amb);
-      const key = new THREE.DirectionalLight(0xfff5d0, 1.4);
+      const key = new THREE.DirectionalLight(0xfff8e0, 1.3);
       key.position.set(5, 8, 5); scene.add(key);
-      const gold = new THREE.DirectionalLight(0xc9a227, 0.7);
+      const gold = new THREE.DirectionalLight(0xb8891e, 0.6);
       gold.position.set(-4, 0, 3); scene.add(gold);
 
       const configs = [
-        { x: -3.5, scale: 0.7, color: 0x1a2040, label: 'M2.5', capColor: 0x4a7060 },
-        { x: 0, scale: 1.0, color: 0x1e3050, label: 'M5.0', capColor: 0x5a8070 },
-        { x: 3.5, scale: 1.3, color: 0x12243a, label: 'M10', capColor: 0x6a9080 },
+        { x: -3.5, scale: 0.7, color: 0x4a4030, label: 'M2.5', capColor: 0x6a7060 },
+        { x: 0, scale: 1.0, color: 0x3a3028, label: 'M5.0', capColor: 0x5a6858 },
+        { x: 3.5, scale: 1.3, color: 0x2a2018, label: 'M10', capColor: 0x4a5848 },
       ];
 
       configs.forEach(cfg => {
         const g = new THREE.Group();
         g.position.x = cfg.x;
         scene.add(g);
-
-        const h = 0.5 * cfg.scale;
-        const w = 0.9 * cfg.scale;
-        const d = 1.6 * cfg.scale;
-
+        const h = 0.5 * cfg.scale, w = 0.9 * cfg.scale, d = 1.6 * cfg.scale;
         const bodyGeo = new THREE.BoxGeometry(w, h, d);
         const bodyMat = new THREE.MeshStandardMaterial({ color: cfg.color, metalness: .65, roughness: .35 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.castShadow = true;
+        const body = new THREE.Mesh(bodyGeo, bodyMat); body.castShadow = true;
         g.add(body);
-
-        // Top cap
         const capGeo = new THREE.BoxGeometry(w * 0.85, 0.06, d * 0.85);
         const capMat = new THREE.MeshStandardMaterial({ color: cfg.capColor, metalness: .5, roughness: .5 });
         const cap = new THREE.Mesh(capGeo, capMat);
-        cap.position.y = h / 2 + 0.03;
-        g.add(cap);
-
-        // Gold clips
+        cap.position.y = h / 2 + 0.03; g.add(cap);
         [-d * 0.3, d * 0.3].forEach(zp => {
           const clipGeo = new THREE.BoxGeometry(0.14 * cfg.scale, 0.1, 0.1);
-          const clip = new THREE.Mesh(clipGeo, new THREE.MeshStandardMaterial({ color: 0xc9a227, metalness: .9, roughness: .1 }));
-          clip.position.set(0, h / 2 + 0.08, zp);
-          g.add(clip);
+          const clip = new THREE.Mesh(clipGeo, new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .1 }));
+          clip.position.set(0, h / 2 + 0.08, zp); g.add(clip);
         });
-
-        // LED dot
         const ledGeo = new THREE.SphereGeometry(0.04, 8, 8);
-        const ledMat = new THREE.MeshStandardMaterial({ color: 0x3ddc84, emissive: 0x3ddc84, emissiveIntensity: 0.9 });
+        const ledMat = new THREE.MeshStandardMaterial({ color: 0x2d8a5f, emissive: 0x2d8a5f, emissiveIntensity: 0.9 });
         const led = new THREE.Mesh(ledGeo, ledMat);
-        led.position.set(w / 2 - 0.06, 0, d / 2 - 0.1);
-        g.add(led);
-
+        led.position.set(w / 2 - 0.06, 0, d / 2 - 0.1); g.add(led);
         g.userData = { baseY: 0, phase: Math.random() * Math.PI * 2 };
       });
 
@@ -2149,18 +2947,15 @@
         renderer.render(scene, camera);
       }
       animate();
-
       window.addEventListener('resize', () => {
         const W2 = canvas.parentElement.clientWidth;
-        camera.aspect = W2 / H;
-        camera.updateProjectionMatrix();
-        renderer.setSize(W2, H);
+        camera.aspect = W2 / H; camera.updateProjectionMatrix(); renderer.setSize(W2, H);
       });
     })();
 
-    /* ════════════════════════════════════════
+    /* ════════════════════════
        SCROLL REVEAL
-    ════════════════════════════════════════ */
+    ════════════════════════ */
     const reveals = document.querySelectorAll('.reveal');
     const io = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); } });
