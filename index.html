@@ -2797,106 +2797,635 @@
     statObs.observe(document.querySelector('.stats-bar'));
 
     /* ════════════════════════════════════════
-       THREE.JS — HERO 3D Battery Pack
+       SHARED PROCEDURAL HELPERS
+    ════════════════════════════════════════ */
+    const _3D = (() => {
+      /* Rounded-rect Shape for ExtrudeGeometry */
+      function roundedRectShape(w, h, r) {
+        const s = new THREE.Shape();
+        const hw = w / 2, hh = h / 2;
+        s.moveTo(-hw + r, -hh);
+        s.lineTo(hw - r, -hh);
+        s.quadraticCurveTo(hw, -hh, hw, -hh + r);
+        s.lineTo(hw, hh - r);
+        s.quadraticCurveTo(hw, hh, hw - r, hh);
+        s.lineTo(-hw + r, hh);
+        s.quadraticCurveTo(-hw, hh, -hw, hh - r);
+        s.lineTo(-hw, -hh + r);
+        s.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
+        return s;
+      }
+
+      /* Thin rectangular groove cut (visible as a dark inset line) */
+      function groove(w, h, d, mat) {
+        const g = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        return g;
+      }
+
+      /* Beveled box via ExtrudeGeometry */
+      function bevelBox(w, h, depth, bevel, mat) {
+        const shape = roundedRectShape(w, depth, bevel);
+        const geo = new THREE.ExtrudeGeometry(shape, {
+          depth: h,
+          bevelEnabled: true,
+          bevelSize: bevel * 0.6,
+          bevelThickness: bevel * 0.6,
+          bevelSegments: 3,
+          curveSegments: 8,
+        });
+        geo.rotateX(-Math.PI / 2);
+        geo.translate(0, 0, 0);
+        const m = new THREE.Mesh(geo, mat);
+        return m;
+      }
+
+      return { roundedRectShape, groove, bevelBox };
+    })();
+
+    /* ════════════════════════════════════════
+       THREE.JS — HERO 3D Battery Pack  (HIGH-FIDELITY)
     ════════════════════════════════════════ */
     (function () {
       const canvas = document.getElementById('hero-canvas');
       const W = canvas.parentElement.clientWidth, H = 560;
       canvas.width = W; canvas.height = H;
 
+      /* ── Renderer ── */
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setSize(W, H);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
 
+      /* ── Scene / Camera ── */
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
-      camera.position.set(4, 2.5, 6);
-      camera.lookAt(0, 0, 0);
+      const camera = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
+      camera.position.set(4.2, 2.8, 6.5);
+      camera.lookAt(0, 0.1, 0);
 
-      const amb = new THREE.AmbientLight(0xffffff, 0.55);
-      scene.add(amb);
-      const key = new THREE.DirectionalLight(0xfff8e0, 1.4);
-      key.position.set(5, 8, 5); key.castShadow = true; scene.add(key);
-      const fill = new THREE.DirectionalLight(0xd0e4ff, 0.5);
-      fill.position.set(-6, 2, -4); scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xc9a227, 0.7);
-      rim.position.set(0, -3, -6); scene.add(rim);
+      /* ── Studio Lighting ── */
+      // Soft ambient
+      scene.add(new THREE.AmbientLight(0xf0ebe0, 0.45));
 
-      const matShell = new THREE.MeshStandardMaterial({ color: 0x8a8070, metalness: .85, roughness: .2 });
-      const matGold = new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .12 });
-      const matModule = new THREE.MeshStandardMaterial({ color: 0x2a2620, metalness: .6, roughness: .4 });
-      const matGreen = new THREE.MeshStandardMaterial({ color: 0x2d8a5f, metalness: .3, roughness: .5, emissive: 0x2d8a5f, emissiveIntensity: .4 });
-      const matConn = new THREE.MeshStandardMaterial({ color: 0x4a4540, metalness: .9, roughness: .1 });
+      // Key light — warm overhead
+      const keyLight = new THREE.DirectionalLight(0xfff5e0, 2.2);
+      keyLight.position.set(4, 9, 5);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.set(2048, 2048);
+      keyLight.shadow.camera.near = 0.5;
+      keyLight.shadow.camera.far = 30;
+      keyLight.shadow.camera.left = -6; keyLight.shadow.camera.right = 6;
+      keyLight.shadow.camera.top = 5;  keyLight.shadow.camera.bottom = -5;
+      keyLight.shadow.bias = -0.0004;
+      scene.add(keyLight);
 
+      // Fill — cool blue from left
+      const fillLight = new THREE.DirectionalLight(0xc8deff, 0.55);
+      fillLight.position.set(-7, 3, -2);
+      scene.add(fillLight);
+
+      // Rim — golden back-edge accent
+      const rimLight = new THREE.DirectionalLight(0xd4a535, 1.0);
+      rimLight.position.set(-1, 1, -8);
+      scene.add(rimLight);
+
+      // Under-bounce — subtle warm ground bounce
+      const bounceLight = new THREE.DirectionalLight(0xf5e8cc, 0.3);
+      bounceLight.position.set(0, -5, 3);
+      scene.add(bounceLight);
+
+      // Top specular accent
+      const topLight = new THREE.PointLight(0xffffff, 0.6, 12);
+      topLight.position.set(0, 6, 0);
+      scene.add(topLight);
+
+      /* ── Materials (color-sampled from reference) ── */
+
+      // Outer housing — brushed dark charcoal aluminium
+      const matHousing = new THREE.MeshStandardMaterial({
+        color: 0x2c2c2c,       // near-black anodised housing
+        metalness: 0.88,
+        roughness: 0.22,
+      });
+
+      // Module body — deep matte anthracite polymer
+      const matModBody = new THREE.MeshStandardMaterial({
+        color: 0x1e1e1e,
+        metalness: 0.4,
+        roughness: 0.72,
+      });
+
+      // Module face plate — slightly lighter structured polymer
+      const matModFace = new THREE.MeshStandardMaterial({
+        color: 0x282828,
+        metalness: 0.3,
+        roughness: 0.65,
+      });
+
+      // Gold accent — anodised gold rails and clips
+      const matGold = new THREE.MeshStandardMaterial({
+        color: 0xb8891e,
+        metalness: 0.96,
+        roughness: 0.08,
+      });
+
+      // Bright gold trim (lighter)
+      const matGoldLight = new THREE.MeshStandardMaterial({
+        color: 0xd4a535,
+        metalness: 0.95,
+        roughness: 0.06,
+      });
+
+      // Connector housing — dark gunmetal
+      const matConnHousing = new THREE.MeshStandardMaterial({
+        color: 0x1a1a1a,
+        metalness: 0.85,
+        roughness: 0.15,
+      });
+
+      // CCS2 pin — copper/gold
+      const matPin = new THREE.MeshStandardMaterial({
+        color: 0xc87d2a,
+        metalness: 0.97,
+        roughness: 0.05,
+      });
+
+      // PCB — dark green substrate
+      const matPCB = new THREE.MeshStandardMaterial({
+        color: 0x0d2214,
+        metalness: 0.1,
+        roughness: 0.8,
+      });
+
+      // LED green emissive
+      const matLEDGreen = new THREE.MeshStandardMaterial({
+        color: 0x00ff88,
+        emissive: 0x00ff88,
+        emissiveIntensity: 2.2,
+        roughness: 0.2,
+        metalness: 0.0,
+      });
+
+      // Seam / groove — very dark
+      const matSeam = new THREE.MeshStandardMaterial({
+        color: 0x0a0a0a,
+        metalness: 0.1,
+        roughness: 0.95,
+      });
+
+      // Screw — polished stainless
+      const matScrew = new THREE.MeshStandardMaterial({
+        color: 0x888888,
+        metalness: 0.98,
+        roughness: 0.04,
+      });
+
+      // Ventilation grill
+      const matVent = new THREE.MeshStandardMaterial({
+        color: 0x111111,
+        metalness: 0.2,
+        roughness: 0.9,
+      });
+
+      /* ══════════════════════════════════════
+         BUILD BATTERY PACK
+      ══════════════════════════════════════ */
       const group = new THREE.Group();
       scene.add(group);
 
-      const shellGeo = new THREE.BoxGeometry(3.6, 0.55, 2.2);
-      const shell = new THREE.Mesh(shellGeo, matShell);
-      shell.position.y = 0.28; shell.castShadow = true;
-      group.add(shell);
+      // ── Dimensions ──
+      const PW = 3.8, PH = 0.72, PD = 2.3;  // pack width, height, depth
+      const bev = 0.055; // bevel radius
 
-      const edgeGeo = new THREE.BoxGeometry(3.62, 0.06, 0.06);
-      const edgeMat = new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .1 });
-      [-0.27, 0.55].forEach(y => {
-        [-1.1, 1.1].forEach(z => {
-          const e = new THREE.Mesh(edgeGeo, edgeMat); e.position.set(0, y, z); group.add(e);
+      /* ─ 1. MAIN OUTER HOUSING (beveled extrude) ─ */
+      {
+        const shape = _3D.roundedRectShape(PW, PD, bev);
+        const geo = new THREE.ExtrudeGeometry(shape, {
+          depth: PH,
+          bevelEnabled: true,
+          bevelSize: bev,
+          bevelThickness: bev,
+          bevelSegments: 4,
+          curveSegments: 10,
         });
-      });
+        geo.rotateX(-Math.PI / 2);
+        geo.translate(0, -PH / 2, 0);
+        const mesh = new THREE.Mesh(geo, matHousing);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+      }
 
-      const modPositions = [-0.9, 0, 0.9];
-      const modColors = [0x3a3528, 0x302c22, 0x28241c];
-      modPositions.forEach((xPos, i) => {
-        const mGeo = new THREE.BoxGeometry(1.05, 0.38, 1.9);
-        const mMat = new THREE.MeshStandardMaterial({ color: modColors[i], metalness: .55, roughness: .45 });
-        const mod = new THREE.Mesh(mGeo, mMat);
-        mod.position.set(xPos, 0.28, 0); mod.castShadow = true;
-        group.add(mod);
-        [-.5, .5].forEach(zOff => {
-          const clipGeo = new THREE.BoxGeometry(0.22, 0.12, 0.12);
+      /* ─ 2. GOLD PERIMETER RAIL (top edge) ─ */
+      {
+        // Top face rail — four segments forming a frame
+        const railH = 0.028;
+        const segments = [
+          // [x, z, w, d] describing each rail piece
+          [0,         PD / 2 - 0.015,   PW - 0.12,  0.028], // front
+          [0,        -PD / 2 + 0.015,   PW - 0.12,  0.028], // back
+          [PW / 2 - 0.015, 0,            0.028, PD - 0.12], // right
+          [-PW / 2 + 0.015, 0,           0.028, PD - 0.12], // left
+        ];
+        segments.forEach(([x, z, sw, sd]) => {
+          const g = new THREE.BoxGeometry(sw, railH, sd);
+          const m = new THREE.Mesh(g, matGold);
+          m.position.set(x, PH / 2 + railH / 2, z);
+          group.add(m);
+        });
+
+        // Bottom rail — mirror
+        segments.forEach(([x, z, sw, sd]) => {
+          const g = new THREE.BoxGeometry(sw, railH, sd);
+          const m = new THREE.Mesh(g, matGold);
+          m.position.set(x, -PH / 2 - railH / 2, z);
+          group.add(m);
+        });
+
+        // Vertical corner pillars
+        [[PW / 2 - 0.015, PD / 2 - 0.015],
+          [-PW / 2 + 0.015, PD / 2 - 0.015],
+          [PW / 2 - 0.015, -PD / 2 + 0.015],
+          [-PW / 2 + 0.015, -PD / 2 + 0.015]].forEach(([x, z]) => {
+            const g = new THREE.BoxGeometry(0.03, PH + 0.06, 0.03);
+            const m = new THREE.Mesh(g, matGoldLight);
+            m.position.set(x, 0, z);
+            group.add(m);
+          });
+      }
+
+      /* ─ 3. MODULE BAYS (4 slots) ─ */
+      const nMods = 4;
+      const modW = (PW - 0.18) / nMods - 0.035;
+      const modH = PH - 0.08;
+      const modD = PD - 0.12;
+      const modSpacing = modW + 0.035;
+      const modStartX = -(nMods - 1) * modSpacing / 2;
+
+      const ledPositions = []; // collect for animation
+
+      for (let i = 0; i < nMods; i++) {
+        const mx = modStartX + i * modSpacing;
+        const modGroup = new THREE.Group();
+        modGroup.position.set(mx, 0, 0);
+        group.add(modGroup);
+
+        /* Module body — beveled */
+        {
+          const shape = _3D.roundedRectShape(modW, modD, 0.03);
+          const geo = new THREE.ExtrudeGeometry(shape, {
+            depth: modH,
+            bevelEnabled: true,
+            bevelSize: 0.018,
+            bevelThickness: 0.018,
+            bevelSegments: 3,
+            curveSegments: 8,
+          });
+          geo.rotateX(-Math.PI / 2);
+          geo.translate(0, -modH / 2, 0);
+          const mesh = new THREE.Mesh(geo, matModBody);
+          mesh.castShadow = true;
+          modGroup.add(mesh);
+        }
+
+        /* Top face plate — slightly proud, lighter colour */
+        {
+          const fpW = modW - 0.04, fpD = modD - 0.04, fpH = 0.014;
+          const shape = _3D.roundedRectShape(fpW, fpD, 0.015);
+          const geo = new THREE.ExtrudeGeometry(shape, {
+            depth: fpH,
+            bevelEnabled: false,
+          });
+          geo.rotateX(-Math.PI / 2);
+          geo.translate(0, -fpH / 2, 0);
+          const m = new THREE.Mesh(geo, matModFace);
+          m.position.y = modH / 2;
+          modGroup.add(m);
+        }
+
+        /* Horizontal structural ribs on body face */
+        const faceZ = modD / 2 + 0.001;
+        for (let r = 0; r < 5; r++) {
+          const ry = -modH / 2 + 0.08 + r * (modH - 0.16) / 4;
+          const ribGeo = new THREE.BoxGeometry(modW - 0.02, 0.008, 0.005);
+          const rib = new THREE.Mesh(ribGeo, matSeam);
+          rib.position.set(0, ry, faceZ);
+          modGroup.add(rib);
+        }
+
+        /* Vertical centre groove on face */
+        {
+          const vg = new THREE.Mesh(new THREE.BoxGeometry(0.007, modH - 0.04, 0.005), matSeam);
+          vg.position.set(0, 0, faceZ);
+          modGroup.add(vg);
+        }
+
+        /* Cooling vent slots — front face, bottom half */
+        const nVents = 6;
+        for (let v = 0; v < nVents; v++) {
+          const vx = -modW / 2 + 0.06 + v * (modW - 0.1) / (nVents - 1);
+          const ventGeo = new THREE.BoxGeometry(0.018, 0.055, 0.006);
+          const vent = new THREE.Mesh(ventGeo, matVent);
+          vent.position.set(vx, -modH / 2 + 0.07, faceZ);
+          modGroup.add(vent);
+        }
+
+        /* Snap-latch clip — gold, top centre */
+        {
+          const clipShape = new THREE.Shape();
+          clipShape.moveTo(-0.06, 0);
+          clipShape.lineTo(0.06, 0);
+          clipShape.lineTo(0.05, 0.055);
+          clipShape.lineTo(-0.05, 0.055);
+          clipShape.closePath();
+          const clipGeo = new THREE.ExtrudeGeometry(clipShape, {
+            depth: 0.045,
+            bevelEnabled: true,
+            bevelSize: 0.006,
+            bevelThickness: 0.006,
+            bevelSegments: 2,
+          });
+          clipGeo.rotateX(-Math.PI / 2);
+          clipGeo.translate(0, 0, -0.022);
           const clip = new THREE.Mesh(clipGeo, matGold);
-          clip.position.set(xPos, 0.52, zOff); group.add(clip);
+          clip.position.set(0, modH / 2 + 0.014, 0);
+          modGroup.add(clip);
+
+          // Latch button centre indent
+          const btnGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.01, 12);
+          const btn = new THREE.Mesh(btnGeo, matGoldLight);
+          btn.position.set(0, modH / 2 + 0.065, 0);
+          modGroup.add(btn);
+        }
+
+        /* LED strip — 4 dots on top face */
+        for (let l = 0; l < 4; l++) {
+          const lx = -modW / 4 + l * (modW / 4);
+          const ledGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.008, 10);
+          const led = new THREE.Mesh(ledGeo, matLEDGreen);
+          led.position.set(lx, modH / 2 + 0.014 + 0.004, -modD / 2 + 0.12);
+          modGroup.add(led);
+          ledPositions.push(led);
+          // LED lens dome
+          const lensGeo = new THREE.SphereGeometry(0.014, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+          const lensMat = new THREE.MeshStandardMaterial({
+            color: 0x00ff88, transparent: true, opacity: 0.7,
+            emissive: 0x00ff88, emissiveIntensity: 1.5,
+          });
+          const lens = new THREE.Mesh(lensGeo, lensMat);
+          lens.position.copy(led.position);
+          lens.position.y += 0.007;
+          modGroup.add(lens);
+        }
+
+        /* Corner screws — M3 hex head */
+        [[modW / 2 - 0.06, modD / 2 - 0.065],
+          [-modW / 2 + 0.06, modD / 2 - 0.065],
+          [modW / 2 - 0.06, -modD / 2 + 0.065],
+          [-modW / 2 + 0.06, -modD / 2 + 0.065]].forEach(([sx, sz]) => {
+            const hexGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.01, 6);
+            const screw = new THREE.Mesh(hexGeo, matScrew);
+            screw.position.set(sx, modH / 2 + 0.014, sz);
+            modGroup.add(screw);
+            // Cross slot
+            const slotGeo = new THREE.BoxGeometry(0.03, 0.004, 0.005);
+            const slot = new THREE.Mesh(slotGeo, matSeam);
+            slot.position.set(sx, modH / 2 + 0.025, sz);
+            modGroup.add(slot);
+          });
+
+        /* Gold side rail per module */
+        [-modD / 2 + 0.005, modD / 2 - 0.005].forEach(rz => {
+          const railGeo = new THREE.BoxGeometry(modW - 0.04, 0.012, 0.014);
+          const rail = new THREE.Mesh(railGeo, matGold);
+          rail.position.set(0, -modH / 2 - 0.006, rz);
+          modGroup.add(rail);
         });
-        const ledGeo = new THREE.SphereGeometry(0.045, 8, 8);
-        const led = new THREE.Mesh(ledGeo, matGreen);
-        led.position.set(xPos + 0.38, 0.48, -.85); group.add(led);
-      });
+      }
 
-      const bmsGeo = new THREE.BoxGeometry(2.8, 0.06, 1.6);
-      const bmsMat = new THREE.MeshStandardMaterial({ color: 0x1a2a18, metalness: .3, roughness: .6 });
-      const bms = new THREE.Mesh(bmsGeo, bmsMat);
-      bms.position.set(0, 0.61, 0); group.add(bms);
+      /* ─ 4. MODULE DIVIDER SEAMS ─ */
+      for (let i = 0; i < nMods - 1; i++) {
+        const sx = modStartX + i * modSpacing + modW / 2 + 0.017;
+        const seamGeo = new THREE.BoxGeometry(0.006, PH + 0.01, PD - 0.04);
+        const seam = new THREE.Mesh(seamGeo, matSeam);
+        seam.position.set(sx, 0, 0);
+        group.add(seam);
+      }
 
-      [[-.9, .12], [0, .09], [.7, .11], [-.3, .08]].forEach(([x, z]) => {
-        const chipGeo = new THREE.BoxGeometry(.14, .04, .14);
-        const chipMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, metalness: .8, roughness: .2 });
-        const chip = new THREE.Mesh(chipGeo, chipMat);
-        chip.position.set(x, 0.65, z); group.add(chip);
-      });
+      /* ─ 5. CCS2 CHARGING PORT (right face) ─ */
+      {
+        const portGroup = new THREE.Group();
+        portGroup.position.set(PW / 2 + 0.002, -PH / 2 + 0.2, 0.4);
+        group.add(portGroup);
 
-      const connGeo = new THREE.BoxGeometry(0.18, 0.28, 0.55);
-      const conn = new THREE.Mesh(connGeo, matConn);
-      conn.position.set(1.89, 0.22, 0.5); group.add(conn);
+        // Port housing box
+        const portHGeo = new THREE.BoxGeometry(0.04, 0.22, 0.38);
+        const portH = new THREE.Mesh(portHGeo, matConnHousing);
+        portGroup.add(portH);
 
-      const usbGeo = new THREE.BoxGeometry(0.04, 0.1, 0.22);
-      const usb = new THREE.Mesh(usbGeo, matGold);
-      usb.position.set(1.98, 0.22, 0.5); group.add(usb);
+        // Outer bezel ridge
+        const bezelGeo = new THREE.BoxGeometry(0.012, 0.24, 0.40);
+        const bezel = new THREE.Mesh(bezelGeo, matGold);
+        bezel.position.x = -0.014;
+        portGroup.add(bezel);
 
-      [[-1.65, -.95], [-1.65, .95], [1.65, -.95], [1.65, .95]].forEach(([x, z]) => {
-        const screwGeo = new THREE.CylinderGeometry(.04, .04, .06, 8);
-        const screw = new THREE.Mesh(screwGeo, edgeMat);
-        screw.position.set(x, 0.59, z); group.add(screw);
-      });
+        // CCS2 AC top connector (oval)
+        const acShape = _3D.roundedRectShape(0.13, 0.09, 0.035);
+        const acGeo = new THREE.ExtrudeGeometry(acShape, { depth: 0.025, bevelEnabled: false });
+        acGeo.rotateY(Math.PI / 2);
+        const ac = new THREE.Mesh(acGeo, matConnHousing);
+        ac.position.set(0.022, 0.055, 0);
+        portGroup.add(ac);
 
-      const floorGeo = new THREE.PlaneGeometry(20, 20);
-      const floorMat = new THREE.ShadowMaterial({ opacity: .1 });
-      const floor = new THREE.Mesh(floorGeo, floorMat);
-      floor.rotation.x = -Math.PI / 2; floor.position.y = -0.1; floor.receiveShadow = true;
-      scene.add(floor);
+        // AC pins (5)
+        const acPinPositions = [[0, 0.02], [0.03, -0.01], [-0.03, -0.01], [0.015, -0.04], [-0.015, -0.04]];
+        acPinPositions.forEach(([py, pz]) => {
+          const pinGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.018, 8);
+          pinGeo.rotateZ(Math.PI / 2);
+          const pin = new THREE.Mesh(pinGeo, matPin);
+          pin.position.set(0.04, 0.055 + py, pz);
+          portGroup.add(pin);
+        });
 
+        // CCS2 DC bottom connector (large oval)
+        const dcShape = _3D.roundedRectShape(0.13, 0.09, 0.04);
+        const dcGeo = new THREE.ExtrudeGeometry(dcShape, { depth: 0.025, bevelEnabled: false });
+        dcGeo.rotateY(Math.PI / 2);
+        const dc = new THREE.Mesh(dcGeo, matConnHousing);
+        dc.position.set(0.022, -0.06, 0);
+        portGroup.add(dc);
+
+        // DC pins (2 large)
+        [0.03, -0.03].forEach(pz => {
+          const pinGeo = new THREE.CylinderGeometry(0.016, 0.016, 0.024, 10);
+          pinGeo.rotateZ(Math.PI / 2);
+          const pin = new THREE.Mesh(pinGeo, matPin);
+          pin.position.set(0.04, -0.06, pz);
+          portGroup.add(pin);
+        });
+
+        // Port protective flap hinge
+        const hingeGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.36, 8);
+        hingeGeo.rotateZ(Math.PI / 2);
+        const hinge = new THREE.Mesh(hingeGeo, matScrew);
+        hinge.position.set(-0.005, 0.13, 0);
+        portGroup.add(hinge);
+      }
+
+      /* ─ 6. STATUS DISPLAY PANEL (right side, front face) ─ */
+      {
+        const dispGroup = new THREE.Group();
+        dispGroup.position.set(PW / 2 + 0.002, 0.05, -0.55);
+        group.add(dispGroup);
+
+        // Display bezel
+        const bezGeo = new THREE.BoxGeometry(0.03, 0.18, 0.28);
+        const bMesh = new THREE.Mesh(bezGeo, matConnHousing);
+        dispGroup.add(bMesh);
+
+        // Screen area (emissive blue)
+        const screenMat = new THREE.MeshStandardMaterial({
+          color: 0x001830,
+          emissive: 0x0a3a6a,
+          emissiveIntensity: 1.2,
+          roughness: 0.05,
+          metalness: 0.0,
+        });
+        const screenGeo = new THREE.BoxGeometry(0.008, 0.14, 0.22);
+        const screen = new THREE.Mesh(screenGeo, screenMat);
+        screen.position.x = 0.012;
+        dispGroup.add(screen);
+
+        // Charge % bar (gold emissive)
+        const barMat = new THREE.MeshStandardMaterial({
+          color: 0xd4a535,
+          emissive: 0xb8891e,
+          emissiveIntensity: 0.8,
+        });
+        const barGeo = new THREE.BoxGeometry(0.008, 0.03, 0.12);
+        const bar = new THREE.Mesh(barGeo, barMat);
+        bar.position.set(0.013, -0.04, -0.02);
+        dispGroup.add(bar);
+
+        // Button below display
+        const btnGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.012, 12);
+        btnGeo.rotateZ(Math.PI / 2);
+        const btn = new THREE.Mesh(btnGeo, matGold);
+        btn.position.set(0.016, -0.12, 0);
+        dispGroup.add(btn);
+      }
+
+      /* ─ 7. HANDLE BAR (top centre) ─ */
+      {
+        const handleGroup = new THREE.Group();
+        handleGroup.position.set(0, PH / 2 + 0.032, 0);
+        group.add(handleGroup);
+
+        // Handle bar — beveled box with clearcoat
+        const handleMat = new THREE.MeshStandardMaterial({
+          color: 0x2a2a2a,
+          metalness: 0.7,
+          roughness: 0.3,
+        });
+        const hGeo = new THREE.BoxGeometry(1.1, 0.065, 0.085);
+        const hMesh = new THREE.Mesh(hGeo, handleMat);
+        hMesh.castShadow = true;
+        handleGroup.add(hMesh);
+
+        // Handle grip ribs
+        for (let r = -3; r <= 3; r++) {
+          const ribGeo = new THREE.BoxGeometry(0.018, 0.07, 0.086);
+          const ribMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.2, roughness: 0.85 });
+          const rib = new THREE.Mesh(ribGeo, ribMat);
+          rib.position.x = r * 0.13;
+          handleGroup.add(rib);
+        }
+
+        // Handle mounts (left & right)
+        [-0.58, 0.58].forEach(hx => {
+          const mountGeo = new THREE.BoxGeometry(0.06, 0.072, 0.09);
+          const mount = new THREE.Mesh(mountGeo, matGold);
+          mount.position.set(hx, 0, 0);
+          handleGroup.add(mount);
+          // Mount screw
+          const mScrewGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.008, 8);
+          const mScrew = new THREE.Mesh(mScrewGeo, matScrew);
+          mScrew.position.set(hx, 0.04, 0);
+          handleGroup.add(mScrew);
+        });
+      }
+
+      /* ─ 8. COOLING FINS — rear face ─ */
+      {
+        const rearZ = -PD / 2 - 0.001;
+        const nFins = 18;
+        const finW = (PW - 0.2) / nFins;
+        for (let f = 0; f < nFins; f++) {
+          const fx = -PW / 2 + 0.1 + f * (PW - 0.2) / nFins + finW / 2;
+          // Vent slot (dark gap)
+          const slotGeo = new THREE.BoxGeometry(finW * 0.45, PH - 0.18, 0.008);
+          const slot = new THREE.Mesh(slotGeo, matVent);
+          slot.position.set(fx, 0, rearZ);
+          group.add(slot);
+          // Fin ridge (housing colour)
+          const ridgeGeo = new THREE.BoxGeometry(finW * 0.52, PH - 0.12, 0.012);
+          const ridge = new THREE.Mesh(ridgeGeo, matHousing);
+          ridge.position.set(fx + finW * 0.5, 0, rearZ - 0.002);
+          group.add(ridge);
+        }
+        // Rear plate behind fins
+        const rearGeo = new THREE.BoxGeometry(PW - 0.1, PH - 0.1, 0.02);
+        const rear = new THREE.Mesh(rearGeo, matHousing);
+        rear.position.set(0, 0, rearZ - 0.012);
+        group.add(rear);
+      }
+
+      /* ─ 9. FRONT STATUS LED BAR (across front) ─ */
+      {
+        const ledBarY = PH / 2 - 0.045;
+        // LED bar track
+        const trackGeo = new THREE.BoxGeometry(PW - 0.25, 0.018, 0.016);
+        const track = new THREE.Mesh(trackGeo, matConnHousing);
+        track.position.set(0, ledBarY, PD / 2 + 0.005);
+        group.add(track);
+
+        // Individual LEDs (8 across)
+        const nLEDs = 8;
+        for (let l = 0; l < nLEDs; l++) {
+          const lx = -(nLEDs - 1) * 0.18 / 2 + l * 0.18;
+          // First 6 green, last 2 dimmer
+          const isLit = l < 6;
+          const lMat = new THREE.MeshStandardMaterial({
+            color: isLit ? 0x00ff88 : 0x003322,
+            emissive: isLit ? 0x00ff88 : 0x001a11,
+            emissiveIntensity: isLit ? 1.8 : 0.2,
+            roughness: 0.2,
+          });
+          const lGeo = new THREE.BoxGeometry(0.06, 0.012, 0.006);
+          const led = new THREE.Mesh(lGeo, lMat);
+          led.position.set(lx, ledBarY, PD / 2 + 0.013);
+          group.add(led);
+        }
+      }
+
+      /* ─ 10. FLOOR / SHADOW CATCHER ─ */
+      {
+        const floorGeo = new THREE.PlaneGeometry(20, 20);
+        const floorMat = new THREE.ShadowMaterial({ opacity: 0.18 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -PH / 2 - 0.12;
+        floor.receiveShadow = true;
+        scene.add(floor);
+      }
+
+      /* ── Interactivity (preserved) ── */
       let isDragging = false, prevMX = 0, prevMY = 0;
-      let rotX = 0.18, rotY = -0.3, targetRotX = 0.18, targetRotY = -0.3;
+      let rotX = 0.20, rotY = -0.35, targetRotX = 0.20, targetRotY = -0.35;
+
       canvas.addEventListener('mousedown', e => { isDragging = true; prevMX = e.clientX; prevMY = e.clientY; });
       window.addEventListener('mouseup', () => isDragging = false);
       window.addEventListener('mousemove', e => {
@@ -2913,27 +3442,35 @@
         targetRotY += (e.touches[0].clientX - prevMX) * 0.008;
         prevMX = e.touches[0].clientX;
       }, { passive: true });
-      let zoom = 6;
-      canvas.addEventListener('wheel', e => { zoom = Math.max(3.5, Math.min(10, zoom + e.deltaY * 0.01)); }, { passive: true });
+      let zoom = 6.8;
+      canvas.addEventListener('wheel', e => { zoom = Math.max(3.5, Math.min(12, zoom + e.deltaY * 0.01)); }, { passive: true });
 
+      /* ── Animation loop ── */
       let t = 0;
       function animate() {
         requestAnimationFrame(animate);
         t += 0.012;
-        rotX += (targetRotX - rotX) * 0.08;
-        rotY += (targetRotY - rotY) * 0.08;
-        if (!isDragging) targetRotY += 0.003;
+        rotX += (targetRotX - rotX) * 0.07;
+        rotY += (targetRotY - rotY) * 0.07;
+        if (!isDragging) targetRotY += 0.0025;
         group.rotation.x = rotX;
         group.rotation.y = rotY;
-        group.position.y = Math.sin(t * 0.5) * 0.05;
+        group.position.y = Math.sin(t * 0.45) * 0.055;
+        // Gentle LED pulse
+        ledPositions.forEach((led, i) => {
+          led.material.emissiveIntensity = 1.8 + Math.sin(t * 1.5 + i * 0.7) * 0.5;
+        });
         const dir = camera.position.clone().normalize();
         camera.position.copy(dir.multiplyScalar(zoom));
         renderer.render(scene, camera);
       }
       animate();
+
       window.addEventListener('resize', () => {
         const W2 = canvas.parentElement.clientWidth;
-        camera.aspect = W2 / H; camera.updateProjectionMatrix(); renderer.setSize(W2, H);
+        camera.aspect = W2 / H;
+        camera.updateProjectionMatrix();
+        renderer.setSize(W2, H);
       });
     })();
 
@@ -2941,83 +3478,261 @@
        THREE.JS — ANATOMY exploded view
     ════════════════════════════════════════ */
     (function () {
-      const canvas = document.createElement('canvas'); // not used here, anatomy removed from how
+      const canvas = document.createElement('canvas'); // stub — anatomy removed
     })();
 
     /* ════════════════════════════════════════
-       THREE.JS — MODULE CANVAS (3 modules)
+       THREE.JS — MODULE CANVAS (HIGH-FIDELITY)
     ════════════════════════════════════════ */
     (function () {
       const canvas = document.getElementById('module-canvas');
       const W = canvas.parentElement.clientWidth, H = 320;
       canvas.width = W; canvas.height = H;
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      /* ── Renderer ── */
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
       renderer.setSize(W, H);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setClearColor(0xe5e1d7, 1);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
 
+      /* ── Scene ── */
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0xe5e1d7, 12, 22);
+      scene.fog = new THREE.Fog(0xe5e1d7, 14, 24);
+      scene.background = new THREE.Color(0xe5e1d7);
 
-      const camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
-      camera.position.set(0, 2.5, 9);
-      camera.lookAt(0, 0, 0);
+      /* ── Camera ── */
+      const camera = new THREE.PerspectiveCamera(36, W / H, 0.1, 100);
+      camera.position.set(0, 3.2, 10.5);
+      camera.lookAt(0, 0.3, 0);
 
-      const amb = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(amb);
-      const key = new THREE.DirectionalLight(0xfff8e0, 1.3);
-      key.position.set(5, 8, 5); scene.add(key);
-      const gold = new THREE.DirectionalLight(0xb8891e, 0.6);
-      gold.position.set(-4, 0, 3); scene.add(gold);
+      /* ── Lighting ── */
+      scene.add(new THREE.AmbientLight(0xf0ece4, 0.5));
 
-      const configs = [
-        { x: -3.5, scale: 0.7, color: 0x4a4030, label: 'M2.5', capColor: 0x6a7060 },
-        { x: 0, scale: 1.0, color: 0x3a3028, label: 'M5.0', capColor: 0x5a6858 },
-        { x: 3.5, scale: 1.3, color: 0x2a2018, label: 'M10', capColor: 0x4a5848 },
+      const key = new THREE.DirectionalLight(0xfff8e0, 2.0);
+      key.position.set(5, 10, 6);
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      key.shadow.bias = -0.0006;
+      scene.add(key);
+
+      const fill = new THREE.DirectionalLight(0xc8d8ff, 0.45);
+      fill.position.set(-8, 2, -2);
+      scene.add(fill);
+
+      const rim = new THREE.DirectionalLight(0xd4a535, 0.8);
+      rim.position.set(0, 0, -9);
+      scene.add(rim);
+
+      scene.add(new THREE.PointLight(0xffffff, 0.4, 18));
+
+      /* ── Shared Materials ── */
+      const matGoldM = new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: 0.95, roughness: 0.08 });
+      const matLEDM = new THREE.MeshStandardMaterial({
+        color: 0x00ff88, emissive: 0x00ff88, emissiveIntensity: 2.0, roughness: 0.2,
+      });
+      const matScrewM = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.97, roughness: 0.04 });
+      const matSeamM = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.1, roughness: 0.95 });
+
+      /* ── Module builder ── */
+      function buildModule(cfg) {
+        const g = new THREE.Group();
+        const { w, h, d, bodyColor, faceColor } = cfg;
+
+        // Body — beveled extrude
+        const bodyMat = new THREE.MeshStandardMaterial({
+          color: bodyColor, metalness: 0.45, roughness: 0.68,
+        });
+        const bodyShape = _3D.roundedRectShape(w, d, 0.035);
+        const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, {
+          depth: h,
+          bevelEnabled: true,
+          bevelSize: 0.022,
+          bevelThickness: 0.022,
+          bevelSegments: 3,
+          curveSegments: 8,
+        });
+        bodyGeo.rotateX(-Math.PI / 2);
+        bodyGeo.translate(0, -h / 2, 0);
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.castShadow = true;
+        body.receiveShadow = true;
+        g.add(body);
+
+        // Top face plate
+        const fpMat = new THREE.MeshStandardMaterial({ color: faceColor, metalness: 0.3, roughness: 0.6 });
+        const fpShape = _3D.roundedRectShape(w - 0.05, d - 0.05, 0.018);
+        const fpGeo = new THREE.ExtrudeGeometry(fpShape, { depth: 0.016, bevelEnabled: false });
+        fpGeo.rotateX(-Math.PI / 2);
+        const fp = new THREE.Mesh(fpGeo, fpMat);
+        fp.position.y = h / 2;
+        g.add(fp);
+
+        // Structural ribs on front face
+        const faceZ = d / 2 + 0.001;
+        const nRibs = 4 + Math.floor(h * 3);
+        for (let r = 0; r < nRibs; r++) {
+          const ry = -h / 2 + 0.07 + r * (h - 0.14) / (nRibs - 1);
+          const rib = new THREE.Mesh(new THREE.BoxGeometry(w - 0.03, 0.008, 0.005), matSeamM);
+          rib.position.set(0, ry, faceZ);
+          g.add(rib);
+        }
+
+        // Vertical centre groove on face
+        const vg = new THREE.Mesh(new THREE.BoxGeometry(0.007, h - 0.06, 0.005), matSeamM);
+        vg.position.set(0, 0, faceZ);
+        g.add(vg);
+
+        // Cooling vents — bottom front
+        const nVents = 5;
+        for (let v = 0; v < nVents; v++) {
+          const vx = -w / 2 + 0.07 + v * (w - 0.12) / (nVents - 1);
+          const ventMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.95 });
+          const vent = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.05, 0.006), ventMat);
+          vent.position.set(vx, -h / 2 + 0.065, faceZ);
+          g.add(vent);
+        }
+
+        // Snap latch — top gold clip
+        {
+          const clipShape = new THREE.Shape();
+          clipShape.moveTo(-0.055, 0);
+          clipShape.lineTo(0.055, 0);
+          clipShape.lineTo(0.045, 0.05);
+          clipShape.lineTo(-0.045, 0.05);
+          clipShape.closePath();
+          const clipGeo = new THREE.ExtrudeGeometry(clipShape, {
+            depth: 0.04, bevelEnabled: true, bevelSize: 0.005, bevelThickness: 0.005, bevelSegments: 2,
+          });
+          clipGeo.rotateX(-Math.PI / 2);
+          clipGeo.translate(0, 0, -0.02);
+          const clip = new THREE.Mesh(clipGeo, matGoldM);
+          clip.position.y = h / 2 + 0.016;
+          g.add(clip);
+
+          // Button on latch
+          const btnGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.009, 10);
+          const btn = new THREE.Mesh(btnGeo, new THREE.MeshStandardMaterial({ color: 0xd4a535, metalness: 0.94, roughness: 0.06 }));
+          btn.position.y = h / 2 + 0.062;
+          g.add(btn);
+        }
+
+        // LEDs on top face (3 dots)
+        for (let l = 0; l < 3; l++) {
+          const lx = -w / 4 + l * (w / 4);
+          const ledGeo = new THREE.CylinderGeometry(0.013, 0.013, 0.008, 10);
+          const led = new THREE.Mesh(ledGeo, matLEDM);
+          led.position.set(lx, h / 2 + 0.016 + 0.004, -d / 2 + 0.1);
+          g.add(led);
+          // Lens
+          const lensGeo = new THREE.SphereGeometry(0.013, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+          const lens = new THREE.Mesh(lensGeo, new THREE.MeshStandardMaterial({
+            color: 0x00ff88, transparent: true, opacity: 0.65,
+            emissive: 0x00ff88, emissiveIntensity: 1.2,
+          }));
+          lens.position.copy(led.position);
+          lens.position.y += 0.006;
+          g.add(lens);
+        }
+
+        // Corner hex screws
+        [[w / 2 - 0.065, d / 2 - 0.07], [-w / 2 + 0.065, d / 2 - 0.07],
+          [w / 2 - 0.065, -d / 2 + 0.07], [-w / 2 + 0.065, -d / 2 + 0.07]].forEach(([sx, sz]) => {
+            const hexGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.01, 6);
+            const screw = new THREE.Mesh(hexGeo, matScrewM);
+            screw.position.set(sx, h / 2 + 0.016, sz);
+            g.add(screw);
+          });
+
+        // Bottom gold rail
+        [-d / 2 + 0.006, d / 2 - 0.006].forEach(rz => {
+          const railGeo = new THREE.BoxGeometry(w - 0.05, 0.011, 0.015);
+          const rail = new THREE.Mesh(railGeo, matGoldM);
+          rail.position.set(0, -h / 2 - 0.006, rz);
+          g.add(rail);
+        });
+
+        // Capacity label plate (slightly recessed on front face)
+        const labelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.1, roughness: 0.85 });
+        const labelGeo = new THREE.BoxGeometry(w * 0.55, 0.065, 0.004);
+        const label = new THREE.Mesh(labelGeo, labelMat);
+        label.position.set(0, h / 2 - 0.08, faceZ + 0.001);
+        g.add(label);
+
+        return g;
+      }
+
+      /* ── Three module configs ── */
+      const moduleConfigs = [
+        {
+          x: -3.6, scale: 1.0,
+          w: 0.82, h: 0.58, d: 1.55,
+          bodyColor: 0x242420,
+          faceColor: 0x2e2e28,
+          label: 'M2.5',
+        },
+        {
+          x: 0, scale: 1.0,
+          w: 0.82, h: 0.88, d: 1.55,
+          bodyColor: 0x1e1e1c,
+          faceColor: 0x282826,
+          label: 'M5.0',
+        },
+        {
+          x: 3.6, scale: 1.0,
+          w: 0.82, h: 1.30, d: 1.55,
+          bodyColor: 0x181816,
+          faceColor: 0x222220,
+          label: 'M10',
+        },
       ];
 
-      configs.forEach(cfg => {
-        const g = new THREE.Group();
-        g.position.x = cfg.x;
-        scene.add(g);
-        const h = 0.5 * cfg.scale, w = 0.9 * cfg.scale, d = 1.6 * cfg.scale;
-        const bodyGeo = new THREE.BoxGeometry(w, h, d);
-        const bodyMat = new THREE.MeshStandardMaterial({ color: cfg.color, metalness: .65, roughness: .35 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat); body.castShadow = true;
-        g.add(body);
-        const capGeo = new THREE.BoxGeometry(w * 0.85, 0.06, d * 0.85);
-        const capMat = new THREE.MeshStandardMaterial({ color: cfg.capColor, metalness: .5, roughness: .5 });
-        const cap = new THREE.Mesh(capGeo, capMat);
-        cap.position.y = h / 2 + 0.03; g.add(cap);
-        [-d * 0.3, d * 0.3].forEach(zp => {
-          const clipGeo = new THREE.BoxGeometry(0.14 * cfg.scale, 0.1, 0.1);
-          const clip = new THREE.Mesh(clipGeo, new THREE.MeshStandardMaterial({ color: 0xb8891e, metalness: .9, roughness: .1 }));
-          clip.position.set(0, h / 2 + 0.08, zp); g.add(clip);
-        });
-        const ledGeo = new THREE.SphereGeometry(0.04, 8, 8);
-        const ledMat = new THREE.MeshStandardMaterial({ color: 0x2d8a5f, emissive: 0x2d8a5f, emissiveIntensity: 0.9 });
-        const led = new THREE.Mesh(ledGeo, ledMat);
-        led.position.set(w / 2 - 0.06, 0, d / 2 - 0.1); g.add(led);
-        g.userData = { baseY: 0, phase: Math.random() * Math.PI * 2 };
+      const modGroups = moduleConfigs.map(cfg => {
+        const mg = buildModule(cfg);
+        mg.position.set(cfg.x, 0, 0);
+        mg.userData = { phase: Math.random() * Math.PI * 2, baseX: cfg.x };
+        scene.add(mg);
+        return mg;
       });
 
+      /* Ground plane */
+      const groundGeo = new THREE.PlaneGeometry(30, 30);
+      const groundMat = new THREE.ShadowMaterial({ opacity: 0.12 });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.85;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      /* ── Animation ── */
       let t = 0;
       function animate() {
         requestAnimationFrame(animate);
-        t += 0.01;
-        scene.children.forEach(obj => {
-          if (obj.userData && obj.userData.phase !== undefined) {
-            obj.position.y = Math.sin(t + obj.userData.phase) * 0.12;
-            obj.rotation.y = t * 0.25 + obj.userData.phase;
-          }
+        t += 0.009;
+        modGroups.forEach((mg, i) => {
+          mg.position.y = Math.sin(t + mg.userData.phase) * 0.14;
+          mg.rotation.y = t * 0.22 + mg.userData.phase;
+          // LED pulse on each module
+          mg.traverse(child => {
+            if (child.isMesh && child.material.emissive) {
+              const base = child.material.color.r > 0.5 ? 2.0 : 0;
+              if (base > 0) child.material.emissiveIntensity = base + Math.sin(t * 1.8 + i * 1.1) * 0.4;
+            }
+          });
         });
         renderer.render(scene, camera);
       }
       animate();
+
       window.addEventListener('resize', () => {
         const W2 = canvas.parentElement.clientWidth;
-        camera.aspect = W2 / H; camera.updateProjectionMatrix(); renderer.setSize(W2, H);
+        camera.aspect = W2 / H;
+        camera.updateProjectionMatrix();
+        renderer.setSize(W2, H);
       });
     })();
 
